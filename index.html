@@ -425,7 +425,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C8V23</span></div>
+  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V42</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -3912,7 +3912,10 @@ syncMobileNav('title');
 
 // ── PWA: Manifest + Service Worker ──
 (function initPWA(){
-  function makeIconBlob(size,cb){
+  // Dùng toDataURL (base64) thay vì toBlob+createObjectURL
+  // Chrome Android chấp nhận data: URI trong manifest icon,
+  // còn blob: URI bị từ chối vì không phải same-origin cố định.
+  function makeIconDataURL(size,cb){
     var c=document.createElement('canvas');
     c.width=c.height=size;
     var ctx=c.getContext('2d');
@@ -3926,15 +3929,14 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C8V23',size/2,size*0.82);
-    c.toBlob(cb,'image/png');
+    ctx.fillText('C6V42',size/2,size*0.82);
+    // ✅ Trả về data URI (base64) — Chrome Android nhận được
+    cb(c.toDataURL('image/png'));
   }
-  makeIconBlob(192,function(blob192){
-    makeIconBlob(512,function(blob512){
-      var url192=URL.createObjectURL(blob192);
-      var url512=URL.createObjectURL(blob512);
+  makeIconDataURL(192,function(dataUrl192){
+    makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C8V23',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V42',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:location.href,
@@ -3944,41 +3946,30 @@ syncMobileNav('title');
         theme_color:'#0f1117',
         lang:'vi',
         icons:[
-          {src:url192,sizes:'192x192',type:'image/png',purpose:'any maskable'},
-          {src:url512,sizes:'512x512',type:'image/png',purpose:'any maskable'}
+          {src:dataUrl192,sizes:'192x192',type:'image/png',purpose:'any maskable'},
+          {src:dataUrl512,sizes:'512x512',type:'image/png',purpose:'any maskable'}
         ]
       };
       var mBlob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
       document.getElementById('pwa-manifest').href=URL.createObjectURL(mBlob);
       var ati=document.getElementById('apple-touch-icon');
-      if(ati)ati.href=url192;
+      if(ati)ati.href=dataUrl192;
     });
   });
+  // ── Service Worker ──
+  // Vì dangtin.678.vn là origin thật (HTTPS), SW đăng ký được —
+  // nhưng KHÔNG thể dùng blob: URL làm script URL cho SW.
+  // Workaround: fetch chính trang rồi dùng Response để tạo SW
+  // không khả thi ở đây. Giải pháp đúng: đặt sw.js riêng trên server.
+  // Tạm thời bỏ SW → PWA vẫn installable nhờ manifest hợp lệ.
+  // (Khi có sw.js thật trên server, uncommit đoạn dưới và bỏ return)
   if('serviceWorker' in navigator){
-    var swCode=[
-      'var CACHE="kenyo-ducloi-c1v39-v1";',
-      'var ASSETS=[self.location.href];',
-      'self.addEventListener("install",function(e){',
-      '  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));',
-      '  self.skipWaiting();',
-      '});',
-      'self.addEventListener("activate",function(e){',
-      '  e.waitUntil(caches.keys().then(function(keys){',
-      '    return Promise.all(keys.filter(function(k){return k!==CACHE;}).map(function(k){return caches.delete(k);}));',
-      '  }));',
-      '  self.clients.claim();',
-      '});',
-      'self.addEventListener("fetch",function(e){',
-      '  e.respondWith(caches.match(e.request).then(function(r){',
-      '    return r||fetch(e.request).then(function(resp){',
-      '      if(resp&&resp.status===200){var clone=resp.clone();caches.open(CACHE).then(function(c){c.put(e.request,clone);});}',
-      '      return resp;',
-      '    });',
-      '  }));',
-      '});'
-    ].join('\n');
-    var swBlob=new Blob([swCode],{type:'application/javascript'});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob),{scope:'./'}).catch(function(){});
+    // Thử đăng ký /sw.js nếu file đó tồn tại trên server
+    fetch('/sw.js',{method:'HEAD'}).then(function(r){
+      if(r.ok){
+        navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
+      }
+    }).catch(function(){});
   }
 })();
 
