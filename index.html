@@ -425,7 +425,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C8V21</span></div>
+  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C8V23</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -1663,8 +1663,11 @@ async function openPostList(){
     body.innerHTML=posts.map(function(p){
       var active=p.post_id===_currentPostId?' style="border-color:var(--accent);background:rgba(99,102,241,.08);"':'';
       var ago=_timeAgo(p.last_updated||0);
+      var snippet=_postListSnippet(p);
+      var snippetHtml=snippet?'<span style="font-size:12px;color:var(--text);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_esc(snippet)+'</span>':'';
       return '<div data-postid="'+p.post_id+'" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
         '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+p.post_id+'</span>'+
+        snippetHtml+
         '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối đã lưu · '+ago+'</span>'+
       '</div>';
     }).join('');
@@ -1682,6 +1685,15 @@ function closePostList(){
 }
 
 function selectPost(postId){
+  if(postId===_currentPostId){closePostList();return;} // đang xem đúng tin này rồi
+  // Reset state sạch — blockTs phải về 0 để data tin mới luôn thắng điều kiện merge
+  blockCodes={};blockTs={};blockFormData={};
+  ALL_BLOCKS.forEach(function(b){
+    var dot=document.getElementById('dot-'+b);if(dot)dot.classList.remove('done');
+    var mdot=document.getElementById('mdot-'+b);if(mdot)mdot.classList.remove('done');
+  });
+  _editCount=0;
+  _updatePostIdDisplay();
   _savePostId(postId);
   closePostList();
   if(_cloudUser){
@@ -1789,6 +1801,20 @@ function _timeAgo(ts){
   return Math.round(s/3600)+'h trước';
 }
 function _esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+// Trích đoạn gợi ý nhận dạng tin — ưu tiên tiêu đề, fallback địa chỉ.
+// Parse riêng từng field để 1 lỗi JSON không làm mất fallback field kia.
+function _postListSnippet(p){
+  var raw='';
+  if(p.title_form_data){
+    try{raw=(JSON.parse(p.title_form_data).val||'').trim();}catch(e){raw='';}
+  }
+  if(!raw&&p.address_form_data){
+    try{raw=(JSON.parse(p.address_form_data).val||'').trim();}catch(e){raw='';}
+  }
+  if(!raw)return '';
+  return raw.length>50?raw.slice(0,50)+'…':raw;
+}
 // Đóng dropdown khi click ra ngoài
 document.addEventListener('click',function(e){
   var dd=document.getElementById('history-dropdown');
@@ -3900,7 +3926,7 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C8V22',size/2,size*0.82);
+    ctx.fillText('C8V23',size/2,size*0.82);
     c.toBlob(cb,'image/png');
   }
   makeIconBlob(192,function(blob192){
@@ -3908,7 +3934,7 @@ syncMobileNav('title');
       var url192=URL.createObjectURL(blob192);
       var url512=URL.createObjectURL(blob512);
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C8V22',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C8V23',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:location.href,
@@ -3930,7 +3956,7 @@ syncMobileNav('title');
   });
   if('serviceWorker' in navigator){
     var swCode=[
-      'var CACHE="kenyo-ducloi-c1v39-v1";',
+      'var CACHE="kenyo-ducloi-c2v41-v1";',
       'var ASSETS=[self.location.href];',
       'self.addEventListener("install",function(e){',
       '  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));',
