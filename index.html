@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>DangtinkenyoDucLoic15v33 — Một giây biết ngay khách</title>
+<title>DangtinkenyoDucLoic1v39 — Một giây biết ngay khách</title>
 <!-- PWA -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1395,6 +1395,7 @@
 var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=1;
 var blockCodes={};
 var blockTs={};   // {blockName: ts} — timestamp từng khối để merge
+var blockFormData={}; // {blockName: {...raw form values...}} — song song với blockCodes, dùng để điền lại form chính xác thay vì regex-parse HTML
 
 // ── POST ID MANAGEMENT ──────────────────────────────────
 var _currentPostId='';
@@ -1435,7 +1436,7 @@ function genNewPostId(){
 
 function loadNewPost(){
   // Reset blockCodes
-  blockCodes={};blockTs={};
+  blockCodes={};blockTs={};blockFormData={};
   ALL_BLOCKS.forEach(function(b){
     var dot=document.getElementById('dot-'+b);
     if(dot)dot.classList.remove('done');
@@ -1451,7 +1452,7 @@ function loadNewPost(){
 }
 
 // ── CLOUD: block-save (push 1 khối) ────────────────────
-function _cloudBlockSave(block,code,ts){
+function _cloudBlockSave(block,code,ts,formData){
   if(!_cloudUser||!_currentPostId)return;
   try{
     fetch(CLOUD_WORKER_URL,{
@@ -1466,6 +1467,7 @@ function _cloudBlockSave(block,code,ts){
         post_id:_currentPostId,
         block:block,
         code:code,
+        formData:formData||null,
         ts:ts,
         device:window.innerWidth<=767?'mobile':'desktop'
       })
@@ -1495,6 +1497,88 @@ function _cloudBlockSave(block,code,ts){
 }
 
 // ── CLOUD: post-load (pull tất cả khối của 1 tin) ──────
+// Ưu tiên blockFormData (raw values, chính xác) — nếu khối đó chưa có formData
+// (dữ liệu cũ lưu trước khi có cột form_data) thì fallback về parse ngược HTML
+// cho 4 khối đã từng hỗ trợ (title/address/map/cta); các khối khác bỏ qua (giữ
+// nguyên hành vi cũ — trước đây cũng không được điền lại).
+function _fillFormsFromBlockCodes(){
+  ALL_BLOCKS.forEach(function(b){
+    if(b==='import')return;
+    if(!blockCodes[b])return;
+    if(blockFormData[b]){
+      _applyFormData(b,blockFormData[b]);
+    }else{
+      _legacyFillBlock(b);
+    }
+  });
+}
+
+function _legacyFillBlock(block){
+  // ── TITLE ──────────────────────────────────────────────
+  if(block==='title'&&blockCodes['title']){
+    var tm=blockCodes['title'].match(/<strong[^>]*>(.*?)<\/strong>/);
+    if(tm){
+      var raw=tm[1].trim();
+      var hasWL=raw.indexOf('[WL] ')===0;
+      if(hasWL)raw=raw.slice(5);
+      document.getElementById('input-title').value=raw;
+      if(hasWL!==wlActive)toggleWL();
+      else updateTitlePreview();
+    }
+  }
+
+  // ── ADDRESS ────────────────────────────────────────────
+  if(block==='address'&&blockCodes['address']){
+    var isCode=blockCodes['address'].indexOf('CODE ')!==-1&&blockCodes['address'].indexOf('đã mã hóa')!==-1;
+    var am;
+    if(isCode){
+      am=blockCodes['address'].match(/CODE ([^<]+)<\/em>/);
+    }else{
+      am=blockCodes['address'].match(/ĐỊA CHỈ: ([^<]+)<\/em>/);
+    }
+    if(am){
+      document.getElementById('input-address').value=am[1].trim();
+      if(isCode!==addrCodeActive)toggleAddrCode();
+      else updateAddressPreview();
+    }
+  }
+
+  // ── MAP ────────────────────────────────────────────────
+  if(block==='map'&&blockCodes['map']){
+    var mm=blockCodes['map'].match(/src="([^"]+)"/);
+    if(mm){
+      var iframeTag='<iframe src="'+mm[1]+'" style="width:100%;height:420px;border:0;" allowfullscreen="" loading="lazy"></iframe>';
+      document.getElementById('input-map').value=iframeTag;
+    }
+  }
+
+  // ── CTA ────────────────────────────────────────────────
+  if(block==='cta'&&blockCodes['cta']){
+    var phones=[];
+    var pr=/<a href="tel:(\d+)"/g;
+    var pm;
+    while((pm=pr.exec(blockCodes['cta']))!==null){
+      phones.push(pm[1]);
+    }
+    // TikTok
+    var ttm=blockCodes['cta'].match(/<a href="(https:\/\/(?:www\.)?tiktok\.com[^"]+)"/);
+    var ttUrl=ttm?ttm[1]:'';
+    // Điền phones vào slots
+    for(var pi=0;pi<phones.length;pi++){
+      var slot=pi+1;
+      // Mở slot nếu chưa mở
+      while(activeCta<slot)addCta();
+      var phoneEl=document.getElementById('cta-phone-'+slot);
+      if(phoneEl)phoneEl.value=phones[pi];
+    }
+    // Điền TikTok
+    if(ttUrl){
+      var ttEl=document.getElementById('cta-tiktok');
+      if(ttEl)ttEl.value=ttUrl;
+    }
+  }
+}
+
 async function _cloudLoadPost(postId){
   if(!_cloudUser||!postId)return;
   _setSyncBadge('syncing','Đang tải tin...');
@@ -1521,12 +1605,19 @@ async function _cloudLoadPost(postId){
       if(row.ts>localTs){
         blockCodes[row.block]=row.code;
         blockTs[row.block]=row.ts;
+        if(row.form_data){
+          try{blockFormData[row.block]=JSON.parse(row.form_data);}catch(e){delete blockFormData[row.block];}
+        }else{
+          delete blockFormData[row.block]; // bản cũ không có form_data — sẽ fallback parse HTML
+        }
         markDone(row.block);
         updated++;
       }
     });
     if(updated>0){
       _setHint('✅ Đã tải '+updated+' khối · '+postId,3);
+      // Điền ngược form từ blockCodes
+      _fillFormsFromBlockCodes();
       // Hiện lại code khối hiện tại nếu có
       if(blockCodes[currentBlock]){
         generatedCode=blockCodes[currentBlock];
@@ -2705,6 +2796,225 @@ function esc(str){
   return str.split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;');
 }
 
+// ── FORM DATA: serialize/apply raw form values (song song với code HTML) ──
+function _getFormData(block){
+  try{
+    switch(block){
+      case 'video':{
+        var urls=[],labels=[];
+        for(var i=1;i<=activeSlots;i++){
+          var u=document.getElementById('url-'+i);
+          urls.push(u?u.value.trim():'');
+          if(i===1){labels.push('');}
+          else{var l=document.getElementById('label-'+i);labels.push(l?l.value.trim():'');}
+        }
+        return {urls:urls,labels:labels,
+          vTitle:document.getElementById('v-title').value.trim(),
+          vDesc:document.getElementById('v-desc').value.trim(),
+          vKeywords:document.getElementById('v-keywords').value.trim()};
+      }
+      case 'title':
+        return {val:document.getElementById('input-title').value.trim(),wl:wlActive};
+      case 'address':
+        return {val:document.getElementById('input-address').value.trim(),codeMode:addrCodeActive};
+      case 'specs':
+        return {raw:document.getElementById('input-specs').value};
+      case 'finance':
+        return {pub:document.getElementById('f-public').value.trim(),
+          price:document.getElementById('f-price').value.trim(),
+          preview:document.getElementById('f-preview').value.trim(),
+          mau:currentMau};
+      case 'map':
+        return {iframeTag:document.getElementById('input-map').value.trim()};
+      case 'cta':{
+        var phones=[];
+        for(var c=1;c<=activeCta;c++){var pe=document.getElementById('cta-phone-'+c);phones.push(pe?pe.value.trim():'');}
+        return {phones:phones,tiktok:document.getElementById('cta-tiktok').value.trim()};
+      }
+      case 'images':{
+        var items=[];
+        for(var ii=1;ii<=activeImgSlots;ii++){
+          var linkEl=document.getElementById('img-link-'+ii);
+          if(!linkEl)continue;
+          var incEl=document.getElementById('img-inc-'+ii);
+          items.push({
+            src:linkEl.value.trim(),
+            caption:(document.getElementById('img-caption-'+ii)||{}).value?document.getElementById('img-caption-'+ii).value.trim():'',
+            alt:(document.getElementById('img-alt-'+ii)||{}).value?document.getElementById('img-alt-'+ii).value.trim():'',
+            title:(document.getElementById('img-title-'+ii)||{}).value?document.getElementById('img-title-'+ii).value.trim():'',
+            inc:incEl?incEl.checked:true
+          });
+        }
+        return {items:items};
+      }
+      case 'legaldoc':{
+        var litems=[];
+        for(var li=1;li<=activeLegalImgSlots;li++){
+          var lLinkEl=document.getElementById('legal-img-link-'+li);
+          if(!lLinkEl)continue;
+          var lIncEl=document.getElementById('legal-img-inc-'+li);
+          litems.push({
+            src:lLinkEl.value.trim(),
+            caption:(document.getElementById('legal-img-caption-'+li)||{}).value?document.getElementById('legal-img-caption-'+li).value.trim():'',
+            alt:(document.getElementById('legal-img-alt-'+li)||{}).value?document.getElementById('legal-img-alt-'+li).value.trim():'',
+            title:(document.getElementById('legal-img-title-'+li)||{}).value?document.getElementById('legal-img-title-'+li).value.trim():'',
+            inc:lIncEl?lIncEl.checked:true
+          });
+        }
+        return {items:litems,
+          ownerName:document.getElementById('legal-owner-name').value.trim(),
+          ownerPhone:document.getElementById('legal-owner-phone').value.trim(),
+          mau:currentLegalMau};
+      }
+      case 'phaply':{
+        var pitems=[];
+        for(var pi=1;pi<=activePlRows;pi++){
+          var pLinkEl=document.getElementById('pl-link-'+pi);
+          if(!pLinkEl)continue;
+          var pIncEl=document.getElementById('pl-inc-'+pi);
+          pitems.push({
+            src:pLinkEl.value.trim(),
+            caption:(document.getElementById('pl-caption-'+pi)||{}).value?document.getElementById('pl-caption-'+pi).value.trim():'',
+            inc:pIncEl?pIncEl.checked:true
+          });
+        }
+        return {items:pitems,
+          ownerName:document.getElementById('pl-owner-name').value.trim(),
+          ownerPhone:document.getElementById('pl-owner-phone').value.trim(),
+          mau:currentPlMau};
+      }
+      case 'aitools':
+        return {forecast:aiBlocks.forecast,offer:aiBlocks.offer,owner:aiBlocks.owner,need:aiBlocks.need,
+          offerN:document.getElementById('offer-n').value.trim(),
+          emails:[document.getElementById('owner-email-1').value.trim(),document.getElementById('owner-email-2').value.trim()]};
+      default:
+        return null; // clock, gopy — không có form để lưu
+    }
+  }catch(e){return null;}
+}
+
+function _applyFormData(block,data){
+  if(!data)return false;
+  try{
+    switch(block){
+      case 'video':{
+        var urls=data.urls||[],labels=data.labels||[];
+        for(var i=0;i<urls.length&&i<5;i++){
+          var slot=i+1;
+          while(activeSlots<slot)addSlot();
+          var u=document.getElementById('url-'+slot);if(u)u.value=urls[i]||'';
+          if(slot>1){var l=document.getElementById('label-'+slot);if(l)l.value=labels[i]||'';}
+          detectType(slot);
+        }
+        document.getElementById('v-title').value=data.vTitle||'';
+        document.getElementById('v-desc').value=data.vDesc||'';
+        document.getElementById('v-keywords').value=data.vKeywords||'';
+        return true;
+      }
+      case 'title':
+        document.getElementById('input-title').value=data.val||'';
+        if(!!data.wl!==wlActive)toggleWL();else updateTitlePreview();
+        return true;
+      case 'address':
+        document.getElementById('input-address').value=data.val||'';
+        if(!!data.codeMode!==addrCodeActive)toggleAddrCode();else updateAddressPreview();
+        return true;
+      case 'specs':
+        document.getElementById('input-specs').value=data.raw||'';
+        return true;
+      case 'finance':
+        document.getElementById('f-public').value=data.pub||'';
+        document.getElementById('f-price').value=data.price||'';
+        document.getElementById('f-preview').value=data.preview||'';
+        selectMau(data.mau===2?2:1);
+        updateFinancePreview();
+        return true;
+      case 'map':
+        document.getElementById('input-map').value=data.iframeTag||'';
+        updateMapPreview();
+        return true;
+      case 'cta':{
+        var phones=data.phones||[];
+        for(var c=0;c<phones.length&&c<5;c++){
+          var slotc=c+1;
+          while(activeCta<slotc)addCta();
+          var pe=document.getElementById('cta-phone-'+slotc);if(pe)pe.value=phones[c]||'';
+        }
+        var ctk=document.getElementById('cta-tiktok');if(ctk)ctk.value=data.tiktok||'';
+        return true;
+      }
+      case 'images':{
+        if(currentBlock==='images')return false;
+        document.getElementById('img-rows').innerHTML='';
+        activeImgSlots=0;
+        (data.items||[]).forEach(function(it){
+          addImgRow();
+          var n=activeImgSlots;
+          var linkEl=document.getElementById('img-link-'+n);if(linkEl)linkEl.value=it.src||'';
+          var capEl=document.getElementById('img-caption-'+n);if(capEl)capEl.value=it.caption||'';
+          var altEl=document.getElementById('img-alt-'+n);if(altEl)altEl.value=it.alt||'';
+          var ttlEl=document.getElementById('img-title-'+n);if(ttlEl)ttlEl.value=it.title||'';
+          if(it.inc===false){var chk=document.getElementById('img-inc-'+n);if(chk){chk.checked=false;toggleImgRow(n);}}
+        });
+        if(activeImgSlots===0)addImgRow();
+        updateImgHint();
+        return true;
+      }
+      case 'legaldoc':{
+        if(currentBlock==='legaldoc')return false;
+        document.getElementById('legal-img-rows').innerHTML='';
+        activeLegalImgSlots=0;
+        (data.items||[]).forEach(function(it){
+          addLegalImgRow();
+          var n=activeLegalImgSlots;
+          var linkEl=document.getElementById('legal-img-link-'+n);if(linkEl)linkEl.value=it.src||'';
+          var capEl=document.getElementById('legal-img-caption-'+n);if(capEl)capEl.value=it.caption||'';
+          var altEl=document.getElementById('legal-img-alt-'+n);if(altEl)altEl.value=it.alt||'';
+          var ttlEl=document.getElementById('legal-img-title-'+n);if(ttlEl)ttlEl.value=it.title||'';
+          if(it.inc===false){var chk=document.getElementById('legal-img-inc-'+n);if(chk){chk.checked=false;toggleLegalImgRow(n);}}
+        });
+        if(activeLegalImgSlots===0)addLegalImgRow();
+        updateLegalImgHint();
+        document.getElementById('legal-owner-name').value=data.ownerName||'';
+        document.getElementById('legal-owner-phone').value=data.ownerPhone||'';
+        selectLegalMau(data.mau===2?2:1);
+        return true;
+      }
+      case 'phaply':{
+        if(currentBlock==='phaply')return false;
+        document.getElementById('pl-rows').innerHTML='';
+        activePlRows=0;
+        (data.items||[]).forEach(function(it){
+          addPlRow();
+          var n=activePlRows;
+          var linkEl=document.getElementById('pl-link-'+n);if(linkEl)linkEl.value=it.src||'';
+          var capEl=document.getElementById('pl-caption-'+n);if(capEl)capEl.value=it.caption||'';
+          if(it.inc===false){var chk=document.getElementById('pl-inc-'+n);if(chk){chk.checked=false;togglePlRow(n);}}
+        });
+        if(activePlRows===0)addPlRow();
+        updatePlHint();
+        document.getElementById('pl-owner-name').value=data.ownerName||'';
+        document.getElementById('pl-owner-phone').value=data.ownerPhone||'';
+        selectPlMau(data.mau===2?2:1);
+        return true;
+      }
+      case 'aitools':{
+        ['forecast','offer','owner','need'].forEach(function(n){
+          var want=!!data[n];
+          if(want!==aiBlocks[n])toggleAiBlock(n);
+        });
+        var on=document.getElementById('offer-n');if(on)on.value=data.offerN||'';
+        var emails=data.emails||[];
+        var e1=document.getElementById('owner-email-1');if(e1)e1.value=emails[0]||'';
+        var e2=document.getElementById('owner-email-2');if(e2)e2.value=emails[1]||'';
+        return true;
+      }
+      default:
+        return false;
+    }
+  }catch(e){return false;}
+}
+
 // Generate
 function generateCode(){
   var code='';
@@ -2981,11 +3291,13 @@ function generateCode(){
     generatedCode=code;
     blockCodes[currentBlock]=code;
     blockTs[currentBlock]=_ts;
+    var _formData=_getFormData(currentBlock);
+    if(_formData)blockFormData[currentBlock]=_formData;
     pushHistory(currentBlock,code);
     updateHistoryBtn(currentBlock);
     _autoSave();
     // Push khối này lên cloud — delta sync
-    _cloudBlockSave(currentBlock,code,_ts);
+    _cloudBlockSave(currentBlock,code,_ts,_formData);
     showCode(code);
     markDone(currentBlock);
     _setHint('Code đã tạo — bấm Copy để dán vào CMS');
@@ -3618,7 +3930,7 @@ syncMobileNav('title');
   });
   if('serviceWorker' in navigator){
     var swCode=[
-      'var CACHE="kenyo-ducloi-c15v33-v1";',
+      'var CACHE="kenyo-ducloi-c1v39-v1";',
       'var ASSETS=[self.location.href];',
       'self.addEventListener("install",function(e){',
       '  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));',
