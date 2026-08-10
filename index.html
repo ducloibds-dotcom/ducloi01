@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>DangtinkenyoDucLoic8v22 — Một giây biết ngay khách</title>
+<title>DangtinkenyoDucLoic15v33 — Một giây biết ngay khách</title>
 <!-- PWA -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1448,12 +1448,13 @@ function loadNewPost(){
 }
 
 // ── CLOUD: block-save (push 1 khối) ────────────────────
-async function _cloudBlockSave(block,code,ts){
+function _cloudBlockSave(block,code,ts){
   if(!_cloudUser||!_currentPostId)return;
   try{
     fetch(CLOUD_WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
+      keepalive:true, // sống sót qua lúc đóng tab/chuyển trang ngay sau khi bấm Tạo code
       body:JSON.stringify({
         action:'block-save',
         phone:_cloudUser.phone||'',
@@ -1465,8 +1466,25 @@ async function _cloudBlockSave(block,code,ts){
         ts:ts,
         device:window.innerWidth<=767?'mobile':'desktop'
       })
+    }).then(function(resp){
+      if(resp.status===401){
+        _setSyncBadge('error','Sai mã nội bộ — khối chưa lưu cloud');
+        return;
+      }
+      return resp.json().then(function(json){
+        if(!json||!json.ok){
+          _setSyncBadge('error','Lỗi lưu cloud');
+          return;
+        }
+        if(json.applied===false){
+          // Server đã từ chối vì có bản mới hơn trên cloud (từ thiết bị khác) — không ghi đè
+          _setSyncBadge('error','Có bản mới hơn trên cloud — bấm 🔄 để lấy về');
+        }
+      });
+    }).catch(function(){
+      _setSyncBadge('error','Offline — khối chưa lưu cloud');
     });
-    // fire-and-forget — không await để không block UI
+    // không await — không block UI, nhưng lỗi vẫn được báo qua badge ở trên
   }catch(e){}
 }
 
@@ -3564,7 +3582,7 @@ syncMobileNav('title');
   });
   if('serviceWorker' in navigator){
     var swCode=[
-      'var CACHE="kenyo-ducloi-c8v22-v1";',
+      'var CACHE="kenyo-ducloi-c15v33-v1";',
       'var ASSETS=[self.location.href];',
       'self.addEventListener("install",function(e){',
       '  e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));',
