@@ -430,11 +430,12 @@
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
     <!-- Mã tin -->
-    <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;">
+    <div id="post-id-wrapper" style="display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;transition:border-color .2s;">
       <span style="font-size:10px;color:var(--text-dim);white-space:nowrap;">📌</span>
       <input id="post-id-input" type="text" placeholder="Mã tin" title="Mã tin đăng"
         style="background:transparent;border:none;outline:none;color:var(--text);font-size:12px;width:90px;font-family:var(--mono);"
         onchange="onPostIdChange()" onblur="onPostIdChange()"/>
+      <span id="edit-count-badge" title="" style="display:none;font-size:10px;font-family:var(--mono);color:var(--accent);font-weight:700;letter-spacing:.03em;"></span>
       <button onclick="genNewPostId()" title="Tạo mã mới" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">🔄</button>
       <button onclick="openPostList()" title="Danh sách tin" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">📋</button>
     </div>
@@ -1443,6 +1444,8 @@ function loadNewPost(){
   });
   var newId=_genPostId();
   _savePostId(newId);
+  _editCount=0;
+  _updatePostIdDisplay();
   _setHint('📌 Tin mới: '+newId+' — bắt đầu điền các khối');
   closePostList();
 }
@@ -1479,6 +1482,9 @@ function _cloudBlockSave(block,code,ts){
         if(json.applied===false){
           // Server đã từ chối vì có bản mới hơn trên cloud (từ thiết bị khác) — không ghi đè
           _setSyncBadge('error','Có bản mới hơn trên cloud — bấm 🔄 để lấy về');
+        }else{
+          _editCount++;
+          _updatePostIdDisplay();
         }
       });
     }).catch(function(){
@@ -1520,13 +1526,17 @@ async function _cloudLoadPost(postId){
       }
     });
     if(updated>0){
-      _setHint('☁️ Đã tải '+updated+' khối từ cloud — mã tin: '+postId,2);
+      _setHint('✅ Đã tải '+updated+' khối · '+postId,3);
       // Hiện lại code khối hiện tại nếu có
       if(blockCodes[currentBlock]){
         generatedCode=blockCodes[currentBlock];
         showCode(generatedCode);
       }
+    }else if(blocks.length>0){
+      _setHint('ℹ️ Cloud không có gì mới hơn local · '+postId,2);
     }
+    _editCount=0;
+    _updatePostIdDisplay();
     _setSyncBadge('synced','Đã sync');
   }catch(e){
     _setSyncBadge('error','Offline');
@@ -1564,7 +1574,7 @@ async function openPostList(){
       var ago=_timeAgo(p.last_updated||0);
       return '<div onclick="selectPost(\''+p.post_id+'\')" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
         '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+p.post_id+'</span>'+
-        '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối · '+ago+'</span>'+
+        '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối đã lưu · '+ago+'</span>'+
       '</div>';
     }).join('');
   }catch(e){
@@ -1579,9 +1589,31 @@ function closePostList(){
 function selectPost(postId){
   _savePostId(postId);
   closePostList();
-  if(_cloudUser)_cloudLoadPost(postId);
+  if(_cloudUser){
+    _setHint('⏳ Đang tải '+postId+'...',3);
+    _cloudLoadPost(postId);
+  }
 }
 var blockHistory={}; // {blockName: [{code, ts}]} max 20 per block
+
+// ── EDIT COUNT (visual only, không ảnh hưởng logic cloud) ──
+var _editCount=0;
+function _updatePostIdDisplay(){
+  var badge=document.getElementById('edit-count-badge');
+  var wrapper=document.getElementById('post-id-wrapper');
+  if(!badge||!wrapper)return;
+  if(_editCount>0){
+    badge.textContent='_'+(_editCount<10?'0':'')+_editCount;
+    badge.title='Đã lưu '+_editCount+' lần kể từ khi tải tin';
+    badge.style.display='inline';
+    wrapper.style.borderColor='var(--accent)';
+  }else{
+    badge.textContent='';
+    badge.title='';
+    badge.style.display='none';
+    wrapper.style.borderColor='var(--border)';
+  }
+}
 
 // ── HINT PRIORITY SYSTEM ──
 var _hintPriority=0;
