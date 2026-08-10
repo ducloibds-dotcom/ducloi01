@@ -429,12 +429,35 @@
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+    <!-- Mã tin -->
+    <div style="display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:4px 8px;">
+      <span style="font-size:10px;color:var(--text-dim);white-space:nowrap;">📌</span>
+      <input id="post-id-input" type="text" placeholder="Mã tin" title="Mã tin đăng"
+        style="background:transparent;border:none;outline:none;color:var(--text);font-size:12px;width:90px;font-family:var(--mono);"
+        onchange="onPostIdChange()" onblur="onPostIdChange()"/>
+      <button onclick="genNewPostId()" title="Tạo mã mới" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">🔄</button>
+      <button onclick="openPostList()" title="Danh sách tin" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">📋</button>
+    </div>
     <button class="btn-session" onclick="saveSession()" title="Lưu phiên làm việc">💾 <span class="session-label">Lưu</span></button>
     <button class="btn-session" onclick="document.getElementById('load-session-input').click()" title="Tải phiên làm việc">📂 <span class="session-label">Load</span></button>
     <button class="btn-session" onclick="openShareDialog()" title="Xuất / chia sẻ phiên làm việc" style="color:var(--accent2);border-color:rgba(16,185,129,.4);">🔗 <span class="session-label">Share</span></button>
     <input type="file" id="load-session-input" accept=".json" style="display:none" onchange="loadSessionFile(event)"/>
     <div class="sync-badge" id="sync-badge" onclick="openLoginBox()" title="Trạng thái đồng bộ cloud">☁️ <span id="sync-label">--</span></div>
     <div class="session-dot" id="session-dot" title="Đã lưu tự động"></div>
+  </div>
+</div>
+
+<!-- Post list overlay -->
+<div id="post-list-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1200;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border-radius:var(--radius);padding:20px;min-width:300px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;gap:12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);">📋 Danh sách tin đã làm</div>
+      <button onclick="closePostList()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;">✕</button>
+    </div>
+    <div id="post-list-body" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;">
+      <div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>
+    </div>
+    <button onclick="loadNewPost()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:10px;font-size:13px;cursor:pointer;font-weight:600;">+ Tạo tin mới</button>
   </div>
 </div>
 
@@ -1370,6 +1393,176 @@
 <script>
 var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=1;
 var blockCodes={};
+var blockTs={};   // {blockName: ts} — timestamp từng khối để merge
+
+// ── POST ID MANAGEMENT ──────────────────────────────────
+var _currentPostId='';
+var POST_ID_KEY='kenyo_post_id';
+
+function _genPostId(){
+  var d=new Date();
+  var ymd=d.getFullYear().toString().slice(-2)+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+  var rnd=Math.floor(Math.random()*900+100);
+  return 'TIN-'+ymd+'-'+rnd;
+}
+
+function _loadPostId(){
+  try{return localStorage.getItem(POST_ID_KEY)||'';}catch(e){return '';}
+}
+
+function _savePostId(id){
+  _currentPostId=id;
+  try{localStorage.setItem(POST_ID_KEY,id);}catch(e){}
+  var el=document.getElementById('post-id-input');
+  if(el&&el.value!==id)el.value=id;
+}
+
+function onPostIdChange(){
+  var el=document.getElementById('post-id-input');
+  var val=(el?el.value:'').trim();
+  if(val&&val!==_currentPostId){
+    _savePostId(val);
+    // Load tin từ cloud nếu đã login
+    if(_cloudUser)_cloudLoadPost(val);
+  }
+}
+
+function genNewPostId(){
+  if(_currentPostId&&!confirm('Tạo mã tin mới? Mã hiện tại: '+_currentPostId))return;
+  loadNewPost();
+}
+
+function loadNewPost(){
+  // Reset blockCodes
+  blockCodes={};blockTs={};
+  ALL_BLOCKS.forEach(function(b){
+    var dot=document.getElementById('dot-'+b);
+    if(dot)dot.classList.remove('done');
+    var mdot=document.getElementById('mdot-'+b);
+    if(mdot)mdot.classList.remove('done');
+  });
+  var newId=_genPostId();
+  _savePostId(newId);
+  _setHint('📌 Tin mới: '+newId+' — bắt đầu điền các khối');
+  closePostList();
+}
+
+// ── CLOUD: block-save (push 1 khối) ────────────────────
+async function _cloudBlockSave(block,code,ts){
+  if(!_cloudUser||!_currentPostId)return;
+  try{
+    fetch(CLOUD_WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'block-save',
+        phone:_cloudUser.phone||'',
+        email:_cloudUser.email||'',
+        secret:_cloudUser.secret||'',
+        post_id:_currentPostId,
+        block:block,
+        code:code,
+        ts:ts,
+        device:window.innerWidth<=767?'mobile':'desktop'
+      })
+    });
+    // fire-and-forget — không await để không block UI
+  }catch(e){}
+}
+
+// ── CLOUD: post-load (pull tất cả khối của 1 tin) ──────
+async function _cloudLoadPost(postId){
+  if(!_cloudUser||!postId)return;
+  _setSyncBadge('syncing','Đang tải tin...');
+  try{
+    var resp=await fetch(CLOUD_WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'post-load',
+        phone:_cloudUser.phone||'',
+        email:_cloudUser.email||'',
+        secret:_cloudUser.secret||'',
+        post_id:postId
+      })
+    });
+    if(resp.status===401){_setSyncBadge('error','Sai mã nội bộ');return;}
+    var json=await resp.json();
+    var blocks=json.blocks||[];
+    if(!blocks.length){_setSyncBadge('synced',_cloudUser.phone);return;}
+    // Merge theo ts — cloud thắng nếu mới hơn
+    var updated=0;
+    blocks.forEach(function(row){
+      var localTs=blockTs[row.block]||0;
+      if(row.ts>localTs){
+        blockCodes[row.block]=row.code;
+        blockTs[row.block]=row.ts;
+        markDone(row.block);
+        updated++;
+      }
+    });
+    if(updated>0){
+      _setHint('☁️ Đã tải '+updated+' khối từ cloud — mã tin: '+postId,2);
+      // Hiện lại code khối hiện tại nếu có
+      if(blockCodes[currentBlock]){
+        generatedCode=blockCodes[currentBlock];
+        showCode(generatedCode);
+      }
+    }
+    _setSyncBadge('synced','Đã sync');
+  }catch(e){
+    _setSyncBadge('error','Offline');
+  }
+}
+
+// ── CLOUD: post-list ────────────────────────────────────
+async function openPostList(){
+  if(!_cloudUser){
+    alert('Cần đăng nhập cloud để xem danh sách tin');
+    openLoginBox();return;
+  }
+  document.getElementById('post-list-overlay').style.display='flex';
+  var body=document.getElementById('post-list-body');
+  body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>';
+  try{
+    var resp=await fetch(CLOUD_WORKER_URL,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        action:'post-list',
+        phone:_cloudUser.phone||'',
+        email:_cloudUser.email||'',
+        secret:_cloudUser.secret||''
+      })
+    });
+    var json=await resp.json();
+    var posts=json.posts||[];
+    if(!posts.length){
+      body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">Chưa có tin nào</div>';
+      return;
+    }
+    body.innerHTML=posts.map(function(p){
+      var active=p.post_id===_currentPostId?' style="border-color:var(--accent);background:rgba(99,102,241,.08);"':'';
+      var ago=_timeAgo(p.last_updated||0);
+      return '<div onclick="selectPost(\''+p.post_id+'\')" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
+        '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+p.post_id+'</span>'+
+        '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối · '+ago+'</span>'+
+      '</div>';
+    }).join('');
+  }catch(e){
+    body.innerHTML='<div style="color:var(--red);font-size:12px;">Lỗi kết nối</div>';
+  }
+}
+
+function closePostList(){
+  document.getElementById('post-list-overlay').style.display='none';
+}
+
+function selectPost(postId){
+  _savePostId(postId);
+  closePostList();
+  if(_cloudUser)_cloudLoadPost(postId);
+}
 var blockHistory={}; // {blockName: [{code, ts}]} max 20 per block
 
 // ── HINT PRIORITY SYSTEM ──
@@ -1671,6 +1864,11 @@ _autoSave=_autoSaveWithCloud;
 
 // Khởi động cloud khi load trang
 async function _initCloud(){
+  // Init post_id
+  var savedPostId=_loadPostId();
+  if(!savedPostId){savedPostId=_genPostId();_savePostId(savedPostId);}
+  else{_savePostId(savedPostId);}
+
   _cloudUser=_loadCloudUser();
   if(!_cloudUser){
     // Kiểm tra server có mã nội bộ chưa — để hiện UI phù hợp
@@ -1693,8 +1891,11 @@ async function _initCloud(){
       },900);
     }
     _setSyncBadge('synced','Đã sync');
+    // Load các khối của tin hiện tại từ cloud
+    if(_currentPostId)setTimeout(function(){_cloudLoadPost(_currentPostId);},500);
   }else{
     _setSyncBadge('synced',_cloudUser.phone);
+    if(_currentPostId)setTimeout(function(){_cloudLoadPost(_currentPostId);},500);
   }
 }
 
@@ -2722,18 +2923,19 @@ function generateCode(){
   }
 
   if(code){
+    var _ts=Date.now();
     generatedCode=code;
     blockCodes[currentBlock]=code;
+    blockTs[currentBlock]=_ts;
     pushHistory(currentBlock,code);
     updateHistoryBtn(currentBlock);
     _autoSave();
+    // Push khối này lên cloud — delta sync
+    _cloudBlockSave(currentBlock,code,_ts);
     showCode(code);
     markDone(currentBlock);
     _setHint('Code đã tạo — bấm Copy để dán vào CMS');
-    // On mobile: auto-open output sheet so user sees result immediately
-    if(window.innerWidth<=767){
-      openOutputSheet();
-    }
+    if(window.innerWidth<=767){openOutputSheet();}
   }
 }
 
