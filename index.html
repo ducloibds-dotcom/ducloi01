@@ -1572,11 +1572,15 @@ async function openPostList(){
     body.innerHTML=posts.map(function(p){
       var active=p.post_id===_currentPostId?' style="border-color:var(--accent);background:rgba(99,102,241,.08);"':'';
       var ago=_timeAgo(p.last_updated||0);
-      return '<div onclick="selectPost(\''+p.post_id+'\')" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
+      return '<div data-postid="'+p.post_id+'" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
         '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+p.post_id+'</span>'+
         '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối đã lưu · '+ago+'</span>'+
       '</div>';
     }).join('');
+    // Gắn click sau khi render — tránh lỗi escape trong inline onclick
+    body.querySelectorAll('[data-postid]').forEach(function(el){
+      el.addEventListener('click',function(){ selectPost(el.getAttribute('data-postid')); });
+    });
   }catch(e){
     body.innerHTML='<div style="color:var(--red);font-size:12px;">Lỗi kết nối</div>';
   }
