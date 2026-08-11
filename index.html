@@ -425,7 +425,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V43</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V45</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -500,15 +500,15 @@
       <span>AI</span>
       <span class="mobile-nav-dot" id="mdot-aitools"></span>
     </div>
-    <div class="mobile-nav-item" data-block="cta" onclick="switchBlock('cta')">
-      <span class="mobile-nav-icon">🔗</span>
-      <span>Liên hệ</span>
-      <span class="mobile-nav-dot" id="mdot-cta"></span>
-    </div>
     <div class="mobile-nav-item" data-block="map" onclick="switchBlock('map')">
       <span class="mobile-nav-icon">🗺️</span>
       <span>Bản đồ, fb</span>
       <span class="mobile-nav-dot" id="mdot-map"></span>
+    </div>
+    <div class="mobile-nav-item" data-block="cta" onclick="switchBlock('cta')">
+      <span class="mobile-nav-icon">🔗</span>
+      <span>Liên hệ, fb</span>
+      <span class="mobile-nav-dot" id="mdot-cta"></span>
     </div>
     <div class="mobile-nav-item" data-block="clock" onclick="switchBlock('clock')">
       <span class="mobile-nav-icon">🕐</span>
@@ -612,13 +612,13 @@
       <span class="block-icon">🤖</span>Công cụ AI
       <span class="block-badge done" id="badge-aitools" style="display:none">✓</span>
     </div>
-    <div class="block-item" data-block="cta" onclick="switchBlock('cta')">
-      <span class="block-icon">🔗</span>Liên hệ
-      <span class="block-badge done" id="badge-cta" style="display:none">✓</span>
-    </div>
     <div class="block-item" data-block="map" onclick="switchBlock('map')">
       <span class="block-icon">🗺️</span>Bản đồ, fb
       <span class="block-badge done" id="badge-map" style="display:none">✓</span>
+    </div>
+    <div class="block-item" data-block="cta" onclick="switchBlock('cta')">
+      <span class="block-icon">🔗</span>Liên hệ, fb
+      <span class="block-badge done" id="badge-cta" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="clock" onclick="switchBlock('clock')">
       <span class="block-icon">🕐</span>Đồng hồ
@@ -986,20 +986,30 @@
         <div class="block-header">
           <div class="block-icon-big">🔗</div>
           <div class="block-header-text">
-            <h2>Khối Liên hệ</h2>
-            <p>Không hiện số điện thoại trên trang — chỉ hiện "Gọi ngay để biết thêm thông tin:" + nút Gọi ngay / Zalo ngay / TikTok ngay (nếu có). Số điện thoại chỉ dùng ngầm để tạo link gọi &amp; Zalo.</p>
+            <h2>Liên hệ, fb</h2>
+            <p id="cta-header-desc">Tùy chọn 1: ẩn số, dùng nút bấm. Tùy chọn 2: hiện số thẳng — dùng cho Facebook.</p>
           </div>
         </div>
+
+        <!-- Tab chọn chế độ -->
+        <div class="form-group">
+          <div style="display:flex;gap:8px;">
+            <button id="cta-tab-1" onclick="switchCtaMode(1)" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">🔗 Tùy chọn 1</button>
+            <button id="cta-tab-2" onclick="switchCtaMode(2)" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;">📱 Tùy chọn 2, fb</button>
+          </div>
+        </div>
+
+        <!-- Vùng CHUNG: SĐT -->
         <div class="form-group">
           <label class="form-label">Số điện thoại <span class="slot-required">* bắt buộc ít nhất 1</span></label>
           <div class="cta-rows" id="cta-rows">
             <div class="cta-row" id="cta-row-1">
               <label>SĐT 1</label>
-              <input class="form-input" id="cta-phone-1" type="text" placeholder="VD: 08888 38022 (có thể gõ khoảng trắng)"/>
+              <input class="form-input" id="cta-phone-1" type="text" value="0888838022" placeholder="VD: 08888 38022"/>
             </div>
-            <div class="cta-row" id="cta-row-2" style="display:none">
+            <div class="cta-row" id="cta-row-2">
               <label>SĐT 2</label>
-              <input class="form-input" id="cta-phone-2" type="text" placeholder="VD: 09766 18802"/>
+              <input class="form-input" id="cta-phone-2" type="text" value="0976618802" placeholder="VD: 09766 18802"/>
             </div>
             <div class="cta-row" id="cta-row-3" style="display:none">
               <label>SĐT 3</label>
@@ -1018,12 +1028,23 @@
             + Thêm số điện thoại <span id="cta-count-hint" style="margin-left:4px;font-size:11px;color:var(--text-dim)">(tối đa 5)</span>
           </button>
         </div>
-        <div class="form-group">
-          <label class="form-label">Link TikTok <span class="form-label-sub">chung cho cả khối — hiện nút "TikTok ngay" ở mỗi dòng liên hệ</span></label>
-          <input class="form-input" id="cta-tiktok" type="text" placeholder="VD: https://www.tiktok.com/@kenyovn"/>
+
+        <!-- Vùng TÙY CHỌN 1: TikTok -->
+        <div id="cta-section-1">
+          <div class="form-group">
+            <label class="form-label">Link TikTok <span class="form-label-sub">hiện nút "TikTok ngay" ở mỗi dòng liên hệ</span></label>
+            <input class="form-input" id="cta-tiktok" type="text" value="https://www.tiktok.com/@kenyovn" placeholder="VD: https://www.tiktok.com/@kenyovn"/>
+          </div>
+          <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            ⚡ Số điện thoại chỉ dùng để tạo link "Gọi ngay" / "Zalo ngay", không hiển thị dạng chữ trên trang. Bỏ trống ô TikTok nếu chưa có kênh — nút "TikTok ngay" sẽ tự ẩn.
+          </div>
         </div>
-        <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          ⚡ Số điện thoại chỉ dùng để tạo link "Gọi ngay" / "Zalo ngay", không hiển thị dạng chữ trên trang. Bỏ trống ô TikTok nếu chưa có kênh — nút "TikTok ngay" sẽ tự ẩn khỏi tất cả các dòng.
+
+        <!-- Vùng TÙY CHỌN 2: fb -->
+        <div id="cta-section-2" style="display:none">
+          <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
+            📱 Output sẽ hiện thẳng: <strong style="color:var(--text)">Gọi ngay để biết thêm thông tin:</strong> + số điện thoại dạng text thuần — phù hợp đăng Facebook.
+          </div>
         </div>
       </div>
 
@@ -1413,7 +1434,7 @@
 </div>
 
 <script>
-var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=1,mapMode='embed';
+var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=2,mapMode='embed',ctaMode=1;
 var blockCodes={};
 var blockTs={};   // {blockName: ts} — timestamp từng khối để merge
 var blockFormData={}; // {blockName: {...raw form values...}} — song song với blockCodes, dùng để điền lại form chính xác thay vì regex-parse HTML
@@ -2537,7 +2558,7 @@ function onHistoryBtnClick(){
   }
 }
 
-var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
+var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
 var ALL_BLOCKS=['import','video','title','address','specs','finance','aitools','cta','map','clock','images','legaldoc','phaply','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
@@ -2659,6 +2680,23 @@ function updateFinancePreview(){
 }
 
 // Map
+function switchCtaMode(mode){
+  ctaMode=mode;
+  var s1=document.getElementById('cta-section-1');
+  var s2=document.getElementById('cta-section-2');
+  var t1=document.getElementById('cta-tab-1');
+  var t2=document.getElementById('cta-tab-2');
+  var accentStyle='flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;';
+  var idleStyle='flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;';
+  if(mode===1){
+    s1.style.display='block';s2.style.display='none';
+    t1.style.cssText=accentStyle;t2.style.cssText=idleStyle;
+  }else{
+    s1.style.display='none';s2.style.display='block';
+    t1.style.cssText=idleStyle;t2.style.cssText=accentStyle;
+  }
+}
+
 function switchMapMode(mode){
   mapMode=mode;
   var embedSection=document.getElementById('map-section-embed');
@@ -3161,7 +3199,7 @@ function generateCode(){
       var mapAddr=document.getElementById('input-map-normal').value.trim();
       if(!mapAddr){_setHint('⚠ Vui lòng nhập địa chỉ');return;}
       var mapLink='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mapAddr);
-      code='<p style="margin:0 0 8px"><a href="'+mapLink+'" target="_blank" style="font-size:15px;">🗺️ '+mapAddr+'</a></p>';
+      code='<p style="margin:0 0 8px"><em style="font-size:15px;">🗺️ Vị trí lân cận</em></p>\n<p style="margin:0 0 8px"><a href="'+mapLink+'" target="_blank" style="font-size:15px;">'+mapLink+'</a></p>';
     }else{
     var mapVal=document.getElementById('input-map').value.trim();
     if(!mapVal){_setHint('⚠ Vui lòng dán thẻ iframe từ Google Maps');return;}
@@ -3184,6 +3222,21 @@ function generateCode(){
     code=ml.join('\n');
     } // end else embed
   }else if(currentBlock==='cta'){
+    if(ctaMode===2){
+      // Tùy chọn 2: text thuần, hiện số điện thoại thẳng
+      var fbLines=['<p style="margin:0 0 8px"><strong style="font-size:15px;">📞 Gọi ngay để biết thêm thông tin:</strong></p>'];
+      var hasFbAny=false;
+      for(var fc=1;fc<=activeCta;fc++){
+        var fbPhoneEl=document.getElementById('cta-phone-'+fc);
+        if(!fbPhoneEl)continue;
+        var fbPhone=fbPhoneEl.value.trim();
+        if(!fbPhone)continue;
+        hasFbAny=true;
+        fbLines.push('<p style="margin:0 0 4px"><em style="font-size:15px;">'+fbPhone+'</em></p>');
+      }
+      if(!hasFbAny){_setHint('⚠ Vui lòng điền ít nhất 1 số điện thoại');return;}
+      code=fbLines.join('\n');
+    }else{
     var ctaLines=['<!-- START: KHỐI LIÊN HỆ -->','','<div style="display:flex;flex-direction:column;gap:12px;">'];
     var hasAny=false;
     var ttUrlShared=document.getElementById('cta-tiktok').value.trim();
@@ -3215,6 +3268,7 @@ function generateCode(){
     ctaLines.push('');
     ctaLines.push('<!-- END: KHỐI LIÊN HỆ -->');
     code=ctaLines.join('\n');
+    } // end ctaMode===1
 
   }else if(currentBlock==='images'){
     var imgLines=['<!-- KHỐI ẢNH -->'];
@@ -3579,13 +3633,16 @@ function resetBlock(){
     document.getElementById('pl-owner-phone').value='';
     selectPlMau(1);
   }else if(currentBlock==='cta'){
-    for(var c=1;c<=5;c++){
+    document.getElementById('cta-phone-1').value='0888838022';
+    document.getElementById('cta-phone-2').value='0976618802';
+    for(var c=3;c<=5;c++){
       var cp=document.getElementById('cta-phone-'+c);if(cp)cp.value='';
-      if(c>=2){var cr=document.getElementById('cta-row-'+c);if(cr)cr.style.display='none';}
+      var cr=document.getElementById('cta-row-'+c);if(cr)cr.style.display='none';
     }
-    var ctk=document.getElementById('cta-tiktok');if(ctk)ctk.value='';
-    activeCta=1;document.getElementById('add-cta-btn').disabled=false;
+    var ctk=document.getElementById('cta-tiktok');if(ctk)ctk.value='https://www.tiktok.com/@kenyovn';
+    activeCta=2;document.getElementById('add-cta-btn').disabled=false;
     document.getElementById('cta-count-hint').textContent='(tối đa 5)';
+    switchCtaMode(1);
   }
   if(currentBlock==='aitools'){
     ['forecast','offer','owner','need'].forEach(function(n){
@@ -3988,14 +4045,14 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C6V43',size/2,size*0.82);
+    ctx.fillText('C6V45',size/2,size*0.82);
     // ✅ Trả về data URI (base64) — Chrome Android nhận được
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V43',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V45',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:location.href,
