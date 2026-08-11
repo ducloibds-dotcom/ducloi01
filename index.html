@@ -425,7 +425,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V42</span></div>
+  <div class="logo">Kenyo <b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V43</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -477,12 +477,12 @@
     </div>
     <div class="mobile-nav-item active" data-block="title" onclick="switchBlock('title')">
       <span class="mobile-nav-icon">🏷️</span>
-      <span>Tiêu đề</span>
+      <span>Tiêu đề, fb</span>
       <span class="mobile-nav-dot" id="mdot-title"></span>
     </div>
     <div class="mobile-nav-item" data-block="address" onclick="switchBlock('address')">
       <span class="mobile-nav-icon">📍</span>
-      <span>Địa chỉ</span>
+      <span>Địa chỉ, fb</span>
       <span class="mobile-nav-dot" id="mdot-address"></span>
     </div>
     <div class="mobile-nav-item" data-block="specs" onclick="switchBlock('specs')">
@@ -507,7 +507,7 @@
     </div>
     <div class="mobile-nav-item" data-block="map" onclick="switchBlock('map')">
       <span class="mobile-nav-icon">🗺️</span>
-      <span>Bản đồ</span>
+      <span>Bản đồ, fb</span>
       <span class="mobile-nav-dot" id="mdot-map"></span>
     </div>
     <div class="mobile-nav-item" data-block="clock" onclick="switchBlock('clock')">
@@ -593,15 +593,15 @@
       <span class="block-badge done" id="badge-video" style="display:none">✓</span>
     </div>
     <div class="block-item active" data-block="title" onclick="switchBlock('title')">
-      <span class="block-icon">🏷️</span>Tiêu đề
+      <span class="block-icon">🏷️</span>Tiêu đề, fb
       <span class="block-badge done" id="badge-title" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="address" onclick="switchBlock('address')">
-      <span class="block-icon">📍</span>Địa chỉ
+      <span class="block-icon">📍</span>Địa chỉ, fb
       <span class="block-badge done" id="badge-address" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="specs" onclick="switchBlock('specs')">
-      <span class="block-icon">📋</span>Thông số BĐS
+      <span class="block-icon">📋</span>Thông số BĐS, fb
       <span class="block-badge done" id="badge-specs" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="finance" onclick="switchBlock('finance')">
@@ -617,7 +617,7 @@
       <span class="block-badge done" id="badge-cta" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="map" onclick="switchBlock('map')">
-      <span class="block-icon">🗺️</span>Bản đồ
+      <span class="block-icon">🗺️</span>Bản đồ, fb
       <span class="block-badge done" id="badge-map" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="clock" onclick="switchBlock('clock')">
@@ -780,7 +780,7 @@
         <div class="block-header">
           <div class="block-icon-big">🏷️</div>
           <div class="block-header-text">
-            <h2>Tiêu đề tin đăng</h2>
+            <h2>Tiêu đề tin đăng, fb</h2>
             <p>In đậm, font 20px. Chọn WL nếu tin đã xác thực.</p>
           </div>
         </div>
@@ -811,7 +811,7 @@
         <div class="block-header">
           <div class="block-icon-big">📍</div>
           <div class="block-header-text">
-            <h2>Địa chỉ</h2>
+            <h2>Địa chỉ, fb</h2>
             <p>In nghiêng, font 15px. Có thể chọn ẩn địa chỉ thật, chỉ hiện mã CODE.</p>
           </div>
         </div>
@@ -842,7 +842,7 @@
         <div class="block-header">
           <div class="block-icon-big">📋</div>
           <div class="block-header-text">
-            <h2>Thông số BĐS</h2>
+            <h2>Thông số BĐS, fb</h2>
             <p>Paste hoặc nhập tự do. Tool tự strip code rác, wrap font 15px.</p>
           </div>
         </div>
@@ -1032,28 +1032,49 @@
         <div class="block-header">
           <div class="block-icon-big">🗺️</div>
           <div class="block-header-text">
-            <h2>Bản đồ</h2>
-            <p>Nhúng Google Maps. <strong style="color:var(--tag-wl)">⚠ Phải làm trên máy tính.</strong></p>
+            <h2>Bản đồ, fb</h2>
+            <p id="map-header-desc">Nhúng Google Maps. <strong style="color:var(--tag-wl)">⚠ Phải làm trên máy tính hoặc nhờ Claude.</strong></p>
           </div>
         </div>
 
-        <div class="form-group" style="padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);line-height:1.8;font-size:12px;color:var(--text-muted);">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:8px;">📋 Hướng dẫn lấy link nhúng (trên máy tính)</div>
-          <div>1. Mở <strong style="color:var(--text)">maps.google.com</strong> trên trình duyệt máy tính</div>
-          <div>2. Tìm địa điểm → nhấn nút <strong style="color:var(--text)">Chia sẻ</strong></div>
-          <div>3. Chọn tab <strong style="color:var(--text)">Nhúng bản đồ</strong></div>
-          <div>4. Nhấn <strong style="color:var(--text)">Sao chép HTML</strong> → dán toàn bộ vào ô bên dưới</div>
+        <!-- Tab chọn chế độ -->
+        <div class="form-group">
+          <div style="display:flex;gap:8px;">
+            <button id="map-tab-embed" onclick="switchMapMode('embed')" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">🗺️ Nhúng iframe</button>
+            <button id="map-tab-normal" onclick="switchMapMode('normal')" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;">🔗 Link thường</button>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Dán toàn bộ thẻ &lt;iframe&gt; từ Google <span class="form-label-sub">tool tự trích src</span></label>
-          <textarea class="form-input" id="input-map" style="min-height:90px;font-family:var(--mono);font-size:12px;" placeholder='&lt;iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"&gt;&lt;/iframe&gt;' oninput="updateMapPreview()"></textarea>
+        <!-- Vùng NHÚNG -->
+        <div id="map-section-embed">
+          <div class="form-group" style="padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);line-height:1.8;font-size:12px;color:var(--text-muted);">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-dim);margin-bottom:8px;">📋 Hướng dẫn lấy link nhúng (trên máy tính)</div>
+            <div>1. Mở <strong style="color:var(--text)">maps.google.com</strong> trên trình duyệt máy tính</div>
+            <div>2. Tìm địa điểm → nhấn nút <strong style="color:var(--text)">Chia sẻ</strong></div>
+            <div>3. Chọn tab <strong style="color:var(--text)">Nhúng bản đồ</strong></div>
+            <div>4. Nhấn <strong style="color:var(--text)">Sao chép HTML</strong> → dán toàn bộ vào ô bên dưới</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Dán toàn bộ thẻ &lt;iframe&gt; từ Google <span class="form-label-sub">tool tự trích src</span></label>
+            <textarea class="form-input" id="input-map" style="min-height:90px;font-family:var(--mono);font-size:12px;" placeholder='&lt;iframe src="https://www.google.com/maps/embed?pb=..." width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"&gt;&lt;/iframe&gt;' oninput="updateMapPreview()"></textarea>
+          </div>
+          <div class="form-group">
+            <div class="preview-label">Xem trước</div>
+            <iframe id="map-preview" class="map-preview-frame" src="" style="display:none;height:260px;"></iframe>
+            <div id="map-preview-empty" class="preview-box"><div class="preview-empty">← Dán thẻ iframe bên trên</div></div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <div class="preview-label">Xem trước</div>
-          <iframe id="map-preview" class="map-preview-frame" src="" style="display:none;height:260px;"></iframe>
-          <div id="map-preview-empty" class="preview-box"><div class="preview-empty">← Dán thẻ iframe bên trên</div></div>
+        <!-- Vùng THƯỜNG -->
+        <div id="map-section-normal" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Địa chỉ <span class="form-label-sub">tool tạo link Google Maps thường</span></label>
+            <input class="form-input" id="input-map-normal" type="text" placeholder="VD: 9998 Thanh Niên, xã Phạm Văn Hai, Huyện Bình Chánh, TP.HCM" oninput="updateMapNormalPreview()"/>
+          </div>
+          <div class="form-group">
+            <div class="preview-label">Link sẽ tạo ra</div>
+            <div id="map-normal-preview" class="preview-box"><div class="preview-empty">← Nhập địa chỉ bên trên</div></div>
+          </div>
         </div>
       </div>
 
@@ -1392,7 +1413,7 @@
 </div>
 
 <script>
-var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=1;
+var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=1,mapMode='embed';
 var blockCodes={};
 var blockTs={};   // {blockName: ts} — timestamp từng khối để merge
 var blockFormData={}; // {blockName: {...raw form values...}} — song song với blockCodes, dùng để điền lại form chính xác thay vì regex-parse HTML
@@ -2516,7 +2537,7 @@ function onHistoryBtnClick(){
   }
 }
 
-var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề',address:'📍 Địa chỉ',specs:'📋 Thông số BĐS',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ',map:'🗺️ Bản đồ',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
+var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
 var ALL_BLOCKS=['import','video','title','address','specs','finance','aitools','cta','map','clock','images','legaldoc','phaply','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
@@ -2638,6 +2659,35 @@ function updateFinancePreview(){
 }
 
 // Map
+function switchMapMode(mode){
+  mapMode=mode;
+  var embedSection=document.getElementById('map-section-embed');
+  var normalSection=document.getElementById('map-section-normal');
+  var tabEmbed=document.getElementById('map-tab-embed');
+  var tabNormal=document.getElementById('map-tab-normal');
+  var accentStyle='flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;';
+  var idleStyle='flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;';
+  if(mode==='embed'){
+    embedSection.style.display='block';
+    normalSection.style.display='none';
+    tabEmbed.style.cssText=accentStyle;
+    tabNormal.style.cssText=idleStyle;
+  }else{
+    embedSection.style.display='none';
+    normalSection.style.display='block';
+    tabEmbed.style.cssText=idleStyle;
+    tabNormal.style.cssText=accentStyle;
+  }
+}
+
+function updateMapNormalPreview(){
+  var val=document.getElementById('input-map-normal').value.trim();
+  var box=document.getElementById('map-normal-preview');
+  if(!val){box.innerHTML='<div class="preview-empty">← Nhập địa chỉ bên trên</div>';return;}
+  var link='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(val);
+  box.innerHTML='<a href="'+link+'" target="_blank" style="font-size:13px;color:var(--accent);word-break:break-all;">'+link+'</a>';
+}
+
 function updateMapPreview(){
   var val=document.getElementById('input-map').value.trim();
   var frame=document.getElementById('map-preview');
@@ -3070,9 +3120,9 @@ function generateCode(){
     if(addrCodeActive){
       var codeNum=extractCodeNum(addr);
       if(!codeNum){_setHint('⚠ Không tìm thấy số trong địa chỉ để làm mã CODE — kiểm tra lại địa chỉ');return;}
-      code='<p style="margin:0 0 8px"><em style="font-size:15px">CODE '+addr+'</em><br><em style="font-size:12px;color:#888">(Code '+codeNum+': thông tin đã mã hóa)</em></p>';
+      code='<p style="margin:0 0 8px"><em style="font-size:15px">🔒 CODE '+addr+'</em><br><em style="font-size:15px;color:#888">🔑 (Code '+codeNum+': thông tin đã mã hóa)</em></p>';
     }else{
-      code='<p style="margin:0 0 8px"><em style="font-size:15px">ĐỊA CHỈ: '+addr+'</em></p>';
+      code='<p style="margin:0 0 8px"><em style="font-size:15px">📍 ĐỊA CHỈ: '+addr+'</em></p>';
     }
 
   }else if(currentBlock==='specs'){
@@ -3107,6 +3157,12 @@ function generateCode(){
     code=fl.join('\n');
 
   }else if(currentBlock==='map'){
+    if(mapMode==='normal'){
+      var mapAddr=document.getElementById('input-map-normal').value.trim();
+      if(!mapAddr){_setHint('⚠ Vui lòng nhập địa chỉ');return;}
+      var mapLink='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mapAddr);
+      code='<p style="margin:0 0 8px"><a href="'+mapLink+'" target="_blank" style="font-size:15px;">🗺️ '+mapAddr+'</a></p>';
+    }else{
     var mapVal=document.getElementById('input-map').value.trim();
     if(!mapVal){_setHint('⚠ Vui lòng dán thẻ iframe từ Google Maps');return;}
     var srcMatch=mapVal.match(/src="([^"]+)"/);
@@ -3126,7 +3182,7 @@ function generateCode(){
     ml.push('    </iframe>');
     ml.push('</div>');
     code=ml.join('\n');
-
+    } // end else embed
   }else if(currentBlock==='cta'){
     var ctaLines=['<!-- START: KHỐI LIÊN HỆ -->','','<div style="display:flex;flex-direction:column;gap:12px;">'];
     var hasAny=false;
@@ -3176,7 +3232,7 @@ function generateCode(){
       var alt=(document.getElementById('img-alt-'+ii).value||'').trim();
       var ttl=(document.getElementById('img-title-'+ii).value||'').trim();
       imgLines.push('');
-      imgLines.push('<p style="font-size:20pt;font-weight:bold;text-decoration:underline;">'+cap+'</p>');
+      imgLines.push('<p style="font-size:15px;font-weight:bold;text-decoration:underline;">'+cap+'</p>');
       imgLines.push('<img src="'+link+'" alt="'+alt+'" title="'+ttl+'" loading="lazy" style="width:100%;height:auto;margin-bottom:20px;" />');
     }
     if(!hasImgAny){_setHint('⚠ Vui lòng thêm ít nhất 1 ảnh (link)');return;}
@@ -3198,7 +3254,7 @@ function generateCode(){
       var lAlt=(document.getElementById('legal-img-alt-'+li).value||'').trim();
       var lTtl=(document.getElementById('legal-img-title-'+li).value||'').trim();
       if(galleryLines.length>0)galleryLines.push('');
-      galleryLines.push('    <p style="font-size:20pt;font-weight:bold;text-transform:uppercase;text-decoration:underline;">'+lCap+'</p>');
+      galleryLines.push('    <p style="font-size:15px;font-weight:bold;text-transform:uppercase;text-decoration:underline;">'+lCap+'</p>');
       galleryLines.push('    <img src="'+lLink+'" alt="'+lAlt+'" title="'+lTtl+'" loading="lazy" style="width:100%;height:auto;margin-bottom:20px;">');
     }
     if(!hasLegalAny){_setHint('⚠ Vui lòng thêm ít nhất 1 ảnh sổ');return;}
@@ -3239,7 +3295,7 @@ function generateCode(){
       hasPlAny=true;
       var pCap=(document.getElementById('pl-caption-'+pi).value||'').trim();
       if(plGalleryLines.length>0)plGalleryLines.push('');
-      plGalleryLines.push('    <p style="font-size:18pt;font-weight:bold;"><strong>'+pCap+'</strong></p>');
+      plGalleryLines.push('    <p style="font-size:15px;font-weight:bold;"><strong>'+pCap+'</strong></p>');
       plGalleryLines.push('    <iframe loading="lazy" src="'+pLink+'" width="100%" height="800" style="border:none;margin-top:25px;"></iframe>');
     }
     if(!hasPlAny){_setHint('⚠ Vui lòng thêm ít nhất 1 hồ sơ pháp lý');return;}
@@ -3501,6 +3557,9 @@ function resetBlock(){
     document.getElementById('map-preview').style.display='none';
     document.getElementById('map-preview-empty').style.display='block';
     document.getElementById('map-preview').src='';
+    document.getElementById('input-map-normal').value='';
+    document.getElementById('map-normal-preview').innerHTML='<div class="preview-empty">← Nhập địa chỉ bên trên</div>';
+    switchMapMode('embed');
   }else if(currentBlock==='images'){
     document.getElementById('img-rows').innerHTML='';
     activeImgSlots=0;
@@ -3929,14 +3988,14 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C6V42',size/2,size*0.82);
+    ctx.fillText('C6V43',size/2,size*0.82);
     // ✅ Trả về data URI (base64) — Chrome Android nhận được
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V42',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V43',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:location.href,
