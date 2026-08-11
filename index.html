@@ -425,7 +425,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V45</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V46</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -1007,7 +1007,7 @@
               <label>SĐT 1</label>
               <input class="form-input" id="cta-phone-1" type="text" value="0888838022" placeholder="VD: 08888 38022"/>
             </div>
-            <div class="cta-row" id="cta-row-2">
+            <div class="cta-row" id="cta-row-2" style="display:flex">
               <label>SĐT 2</label>
               <input class="form-input" id="cta-phone-2" type="text" value="0976618802" placeholder="VD: 09766 18802"/>
             </div>
@@ -2722,8 +2722,7 @@ function updateMapNormalPreview(){
   var val=document.getElementById('input-map-normal').value.trim();
   var box=document.getElementById('map-normal-preview');
   if(!val){box.innerHTML='<div class="preview-empty">← Nhập địa chỉ bên trên</div>';return;}
-  var link='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(val);
-  box.innerHTML='<a href="'+link+'" target="_blank" style="font-size:13px;color:var(--accent);word-break:break-all;">'+link+'</a>';
+  box.innerHTML='<a href="'+val+'" target="_blank" style="font-size:13px;color:var(--accent);word-break:break-all;">'+val+'</a>';
 }
 
 function updateMapPreview(){
@@ -3201,8 +3200,7 @@ function generateCode(){
     if(mapMode==='normal'){
       var mapAddr=document.getElementById('input-map-normal').value.trim();
       if(!mapAddr){_setHint('⚠ Vui lòng nhập địa chỉ');return;}
-      var mapLink='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(mapAddr);
-      code='<p style="margin:0 0 8px"><em style="font-size:15px;">🗺️ Vị trí lân cận</em></p>\n<p style="margin:0 0 8px"><a href="'+mapLink+'" target="_blank" style="font-size:15px;">'+mapLink+'</a></p>';
+      code='<p style="margin:0 0 8px"><em style="font-size:15px;">🗺️ Vị trí lân cận</em></p>\n<p style="margin:0 0 8px"><a href="'+mapAddr+'" target="_blank" style="font-size:15px;">'+mapAddr+'</a></p>';
     }else{
     var mapVal=document.getElementById('input-map').value.trim();
     if(!mapVal){_setHint('⚠ Vui lòng dán thẻ iframe từ Google Maps');return;}
@@ -4048,14 +4046,14 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C6V45',size/2,size*0.82);
+    ctx.fillText('C6V46',size/2,size*0.82);
     // ✅ Trả về data URI (base64) — Chrome Android nhận được
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V45',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V46',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:location.href,
