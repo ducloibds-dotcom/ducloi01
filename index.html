@@ -2939,11 +2939,11 @@ function _getFormData(block){
           preview:document.getElementById('f-preview').value.trim(),
           mau:currentMau};
       case 'map':
-        return {iframeTag:document.getElementById('input-map').value.trim()};
+        return {iframeTag:document.getElementById('input-map').value.trim(),mapMode:mapMode,mapNormal:(document.getElementById('input-map-normal')||{value:''}).value.trim()};
       case 'cta':{
         var phones=[];
         for(var c=1;c<=activeCta;c++){var pe=document.getElementById('cta-phone-'+c);phones.push(pe?pe.value.trim():'');}
-        return {phones:phones,tiktok:document.getElementById('cta-tiktok').value.trim()};
+        return {phones:phones,tiktok:document.getElementById('cta-tiktok').value.trim(),ctaMode:ctaMode};
       }
       case 'images':{
         var items=[];
@@ -3045,7 +3045,9 @@ function _applyFormData(block,data){
         return true;
       case 'map':
         document.getElementById('input-map').value=data.iframeTag||'';
-        updateMapPreview();
+        var mn=document.getElementById('input-map-normal');if(mn)mn.value=data.mapNormal||'';
+        switchMapMode(data.mapMode||'embed');
+        updateMapPreview();updateMapNormalPreview();
         return true;
       case 'cta':{
         var phones=data.phones||[];
@@ -3055,6 +3057,7 @@ function _applyFormData(block,data){
           var pe=document.getElementById('cta-phone-'+slotc);if(pe)pe.value=phones[c]||'';
         }
         var ctk=document.getElementById('cta-tiktok');if(ctk)ctk.value=data.tiktok||'';
+        switchCtaMode(data.ctaMode||1);
         return true;
       }
       case 'images':{
