@@ -71,8 +71,12 @@
   .output-panel{width:380px;min-width:320px;border-left:1px solid var(--border);display:flex;flex-direction:column;background:var(--surface);}
   .output-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
   .output-header h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);flex:1;}
+  .output-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;}
+  .output-tab{flex:1;padding:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;color:var(--text-dim);border-bottom:2px solid transparent;background:transparent;border-top:none;border-left:none;border-right:none;transition:all .15s;}
+  .output-tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+  .output-body{flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden;}
   .output-code{flex:1;padding:16px;overflow-y:auto;}
-  .output-preview-wrap{border-top:1px solid var(--border);display:flex;flex-direction:column;height:280px;flex-shrink:0;}
+  .output-preview-wrap{display:none;flex-direction:column;flex:1;min-height:0;}
   .preview-frame{flex:1;border:none;width:100%;background:#fff;display:none;}
   .preview-frame-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:8px;color:var(--text-dim);}
 
@@ -593,7 +597,7 @@
       </div>
     </div>
     <div class="sheet-copy-bar">
-      <button class="btn-copy" id="sheet-btn-copy" onclick="copyCode()" style="width:100%;justify-content:center;padding:14px;font-size:14px;font-weight:600;">
+      <button class="btn-copy" id="sheet-btn-copy" onclick="copyCode('sheet')" style="width:100%;justify-content:center;padding:14px;font-size:14px;font-weight:600;">
         <span id="sheet-copy-icon">📋</span><span id="sheet-copy-text">Copy toàn bộ code</span>
       </button>
     </div>
@@ -1282,27 +1286,30 @@
   <!-- Output panel -->
   <div class="output-panel">
     <div class="output-header">
-      <h3>Code HTML</h3>
-      <button class="btn-copy" id="btn-copy" onclick="copyCode()">
+      <h3>Kết quả</h3>
+      <button class="btn-copy" id="btn-copy" onclick="copyCode('desktop')">
         <span id="copy-icon">📋</span><span id="copy-text">Copy</span>
       </button>
     </div>
-    <div class="output-code">
-      <div id="code-output-empty" class="code-empty">
-        <div class="code-empty-icon">🖥️</div>
-        <div class="code-empty-text">Code HTML sẽ hiện ở đây<br>sau khi bấm "Tạo code"</div>
-      </div>
-      <pre id="code-output" class="code-block" style="display:none"></pre>
+    <div class="output-tabs">
+      <button class="output-tab active" id="otab-code" onclick="switchOutputTab('code')">Code</button>
+      <button class="output-tab" id="otab-preview" onclick="switchOutputTab('preview')">Xem trước</button>
     </div>
-    <div class="output-preview-wrap">
-      <div class="output-header" style="border-bottom:1px solid var(--border);">
-        <h3>Xem trước</h3>
+    <div class="output-body">
+      <div class="output-code" id="output-code-area">
+        <div id="code-output-empty" class="code-empty">
+          <div class="code-empty-icon">🖥️</div>
+          <div class="code-empty-text">Code HTML sẽ hiện ở đây<br>sau khi bấm "Tạo code"</div>
+        </div>
+        <pre id="code-output" class="code-block" style="display:none"></pre>
       </div>
-      <div id="preview-frame-empty" class="preview-frame-empty">
-        <div class="code-empty-icon">👁️</div>
-        <div class="code-empty-text">Bản xem trước sẽ hiện ở đây<br>sau khi bấm "Tạo code"</div>
+      <div class="output-preview-wrap" id="output-preview-area">
+        <div id="preview-frame-empty" class="preview-frame-empty">
+          <div class="code-empty-icon">👁️</div>
+          <div class="code-empty-text">Bản xem trước sẽ hiện ở đây<br>sau khi bấm "Tạo code"</div>
+        </div>
+        <iframe id="preview-frame" class="preview-frame"></iframe>
       </div>
-      <iframe id="preview-frame" class="preview-frame"></iframe>
     </div>
   </div>
 </div>
@@ -3558,8 +3565,37 @@ function updatePreviewFrame(code){
   frame.srcdoc=doc;
   frame.style.display='block';empty.style.display='none';
 }
-function copyCode(){
+function getPreviewPlainText(code){
+  if(!code)return '';
+  var wrap=document.createElement('div');
+  wrap.style.cssText='position:fixed;left:-9999px;top:0;width:720px;opacity:0;pointer-events:none;';
+  wrap.innerHTML=code;
+  wrap.querySelectorAll('script,style,noscript').forEach(function(el){el.remove();});
+  document.body.appendChild(wrap);
+  var text=(wrap.innerText||wrap.textContent||'');
+  document.body.removeChild(wrap);
+  return text
+    .replace(/\u00a0/g,' ')
+    .split(/\r?\n/)
+    .map(function(line){return line.replace(/[ \t]+/g,' ').trim();})
+    .filter(function(line,idx,arr){return line || (idx>0 && arr[idx-1]);})
+    .join('\n')
+    .replace(/\n{3,}/g,'\n\n')
+    .trim();
+}
+function getCopyPayload(source){
+  var activeTab=(source==='sheet')?sheetCurrentTab:outputCurrentTab;
+  return activeTab==='preview'?getPreviewPlainText(generatedCode):generatedCode;
+}
+function updateCopyButtons(){
+  var ct=document.getElementById('copy-text');
+  var sct=document.getElementById('sheet-copy-text');
+  if(ct)ct.textContent=outputCurrentTab==='preview'?'Copy text':'Copy code';
+  if(sct)sct.textContent=sheetCurrentTab==='preview'?'Copy text xem trước':'Copy toàn bộ code';
+}
+function copyCode(source){
   if(!generatedCode)return;
+  var payload=getCopyPayload(source||'desktop');
   function _setCopied(){
     var ci=document.getElementById('copy-icon');
     var ct=document.getElementById('copy-text');
@@ -3575,15 +3611,14 @@ function copyCode(){
     if(sbc)sbc.classList.add('copied');
     setTimeout(function(){
       if(ci)ci.textContent='📋';
-      if(ct)ct.textContent='Copy';
       if(bc)bc.classList.remove('copied');
       if(sci)sci.textContent='📋';
-      if(sct)sct.textContent='Copy toàn bộ code';
       if(sbc)sbc.classList.remove('copied');
+      updateCopyButtons();
     },2000);
   }
   if(navigator.clipboard&&navigator.clipboard.writeText){
-    navigator.clipboard.writeText(generatedCode).then(_setCopied).catch(function(){
+    navigator.clipboard.writeText(payload).then(_setCopied).catch(function(){
       _fallbackCopy();
     });
   }else{
@@ -3591,7 +3626,7 @@ function copyCode(){
   }
   function _fallbackCopy(){
     var ta=document.createElement('textarea');
-    ta.value=generatedCode;
+    ta.value=payload;
     ta.style.cssText='position:fixed;top:0;left:0;opacity:0;pointer-events:none;';
     document.body.appendChild(ta);
     ta.focus();ta.select();
@@ -3685,6 +3720,8 @@ function resetBlock(){
   document.getElementById('code-output-empty').style.display='flex';
   document.getElementById('code-output').style.display='none';
   updatePreviewFrame('');
+  updateCopyButtons();
+  if(typeof syncSheetContent==='function')syncSheetContent();
   _setHint('Điền thông tin rồi bấm tạo code');
 }
 
@@ -3914,7 +3951,17 @@ function smartImport(){
 }
 
 // ========== MOBILE OUTPUT SHEET ==========
+var outputCurrentTab = 'code';
 var sheetCurrentTab = 'code';
+
+function switchOutputTab(tab) {
+  outputCurrentTab = tab;
+  document.getElementById('otab-code').className = 'output-tab' + (tab === 'code' ? ' active' : '');
+  document.getElementById('otab-preview').className = 'output-tab' + (tab === 'preview' ? ' active' : '');
+  document.getElementById('output-code-area').style.display = tab === 'code' ? 'block' : 'none';
+  document.getElementById('output-preview-area').style.display = tab === 'preview' ? 'flex' : 'none';
+  updateCopyButtons();
+}
 
 function openOutputSheet() {
   document.getElementById('mobile-output-sheet').classList.add('open');
@@ -3933,6 +3980,7 @@ function switchSheetTab(tab) {
   document.getElementById('stab-preview').className = 'sheet-tab' + (tab === 'preview' ? ' active' : '');
   document.getElementById('sheet-code-area').style.display = tab === 'code' ? 'block' : 'none';
   document.getElementById('sheet-preview-area').style.display = tab === 'preview' ? 'flex' : 'none';
+  updateCopyButtons();
 }
 
 function syncSheetContent() {
@@ -3969,6 +4017,7 @@ function syncSheetContent() {
     previewFrame.style.display = 'none';
     if (outputBtn) outputBtn.innerHTML = '📋 Xem code';
   }
+  updateCopyButtons();
 }
 
 // ========== MOBILE NAV SYNC ==========
@@ -4004,6 +4053,8 @@ showCode = function(code) {
   _origShowCode(code);
   syncSheetContent();
 };
+
+updateCopyButtons();
 
 // switchBlock now handles both sidebar + mobile nav natively (no patch needed)
 
