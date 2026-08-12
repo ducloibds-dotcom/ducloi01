@@ -495,11 +495,6 @@
       <span>Tài chính</span>
       <span class="mobile-nav-dot" id="mdot-finance"></span>
     </div>
-    <div class="mobile-nav-item" data-block="aitools" onclick="switchBlock('aitools')">
-      <span class="mobile-nav-icon">🤖</span>
-      <span>AI</span>
-      <span class="mobile-nav-dot" id="mdot-aitools"></span>
-    </div>
     <div class="mobile-nav-item" data-block="map" onclick="switchBlock('map')">
       <span class="mobile-nav-icon">🗺️</span>
       <span>Bản đồ, fb</span>
@@ -509,6 +504,11 @@
       <span class="mobile-nav-icon">🔗</span>
       <span>Liên hệ, fb</span>
       <span class="mobile-nav-dot" id="mdot-cta"></span>
+    </div>
+    <div class="mobile-nav-item" data-block="aitools" onclick="switchBlock('aitools')">
+      <span class="mobile-nav-icon">🤖</span>
+      <span>AI</span>
+      <span class="mobile-nav-dot" id="mdot-aitools"></span>
     </div>
     <div class="mobile-nav-item" data-block="clock" onclick="switchBlock('clock')">
       <span class="mobile-nav-icon">🕐</span>
@@ -608,10 +608,6 @@
       <span class="block-icon">💵</span>Tài chính
       <span class="block-badge done" id="badge-finance" style="display:none">✓</span>
     </div>
-    <div class="block-item" data-block="aitools" onclick="switchBlock('aitools')">
-      <span class="block-icon">🤖</span>Công cụ AI
-      <span class="block-badge done" id="badge-aitools" style="display:none">✓</span>
-    </div>
     <div class="block-item" data-block="map" onclick="switchBlock('map')">
       <span class="block-icon">🗺️</span>Bản đồ, fb
       <span class="block-badge done" id="badge-map" style="display:none">✓</span>
@@ -619,6 +615,10 @@
     <div class="block-item" data-block="cta" onclick="switchBlock('cta')">
       <span class="block-icon">🔗</span>Liên hệ, fb
       <span class="block-badge done" id="badge-cta" style="display:none">✓</span>
+    </div>
+    <div class="block-item" data-block="aitools" onclick="switchBlock('aitools')">
+      <span class="block-icon">🤖</span>Công cụ AI
+      <span class="block-badge done" id="badge-aitools" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="clock" onclick="switchBlock('clock')">
       <span class="block-icon">🕐</span>Đồng hồ
@@ -812,7 +812,7 @@
           <div class="block-icon-big">📍</div>
           <div class="block-header-text">
             <h2>Địa chỉ, fb</h2>
-            <p>In nghiêng, font 15px. Có thể chọn ẩn địa chỉ thật, chỉ hiện mã CODE.</p>
+            <p>In nghiêng, font 15px. Có thể chọn ẩn địa chỉ thật, chỉ hiện mã KENYO.</p>
           </div>
         </div>
         <div class="form-group">
@@ -824,8 +824,8 @@
           <div class="toggle-row" id="addr-code-toggle" onclick="toggleAddrCode()">
             <div class="toggle-switch"></div>
             <div class="toggle-label">
-              <strong>Ẩn địa chỉ thật, hiện mã CODE</strong>
-              <span>Bật nếu khách không chọn xem địa chỉ — số đứng đầu địa chỉ sẽ dùng làm mã CODE</span>
+              <strong>Ẩn địa chỉ thật, hiện mã KENYO</strong>
+              <span>Bật nếu khách không chọn xem địa chỉ — số đứng đầu địa chỉ sẽ dùng làm mã KENYO</span>
             </div>
           </div>
         </div>
@@ -1571,10 +1571,10 @@ function _legacyFillBlock(block){
 
   // ── ADDRESS ────────────────────────────────────────────
   if(block==='address'&&blockCodes['address']){
-    var isCode=blockCodes['address'].indexOf('CODE ')!==-1&&blockCodes['address'].indexOf('đã mã hóa')!==-1;
+    var isCode=(blockCodes['address'].indexOf('CODE ')!==-1||blockCodes['address'].indexOf('KENYO ')!==-1)&&blockCodes['address'].indexOf('đã mã hóa')!==-1;
     var am;
     if(isCode){
-      am=blockCodes['address'].match(/CODE ([^<]+)<\/em>/);
+      am=blockCodes['address'].match(/(?:CODE|KENYO) ([^<]+)<\/em>/);
     }else{
       am=blockCodes['address'].match(/ĐỊA CHỈ: ([^<]+)<\/em>/);
     }
@@ -2559,7 +2559,7 @@ function onHistoryBtnClick(){
 }
 
 var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
-var ALL_BLOCKS=['import','video','title','address','specs','finance','aitools','map','cta','clock','images','legaldoc','phaply','gopy'];
+var ALL_BLOCKS=['import','video','title','address','specs','finance','map','cta','aitools','clock','images','legaldoc','phaply','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
 var activePlRows=0,MAX_PL=20,currentPlMau=1;
@@ -2655,7 +2655,7 @@ function updateAddressPreview(){
   p.className='';p.style.fontStyle='italic';p.style.fontSize='15px';p.style.color='var(--text)';
   if(addrCodeActive){
     var codeNum=extractCodeNum(val);
-    p.innerHTML='CODE '+esc(val)+'<br><span style="font-size:12px;color:var(--text-dim);font-style:normal">(Code '+(codeNum||'?')+': thông tin đã mã hóa)</span>';
+    p.innerHTML='KENYO '+esc(val)+'<br><span style="font-size:12px;color:var(--text-dim);font-style:normal">(Kenyo '+(codeNum||'?')+': thông tin đã mã hóa)</span>';
   }else{
     p.textContent='ĐỊA CHỈ: '+val;
   }
@@ -3159,8 +3159,8 @@ function generateCode(){
     if(!addr){_setHint('⚠ Vui lòng nhập địa chỉ');return;}
     if(addrCodeActive){
       var codeNum=extractCodeNum(addr);
-      if(!codeNum){_setHint('⚠ Không tìm thấy số trong địa chỉ để làm mã CODE — kiểm tra lại địa chỉ');return;}
-      code='<p style="margin:0 0 8px"><em style="font-size:15px">🔒 CODE '+addr+'</em><br><em style="font-size:15px;color:#888">🔑 (Code '+codeNum+': thông tin đã mã hóa)</em></p>';
+      if(!codeNum){_setHint('⚠ Không tìm thấy số trong địa chỉ để làm mã KENYO — kiểm tra lại địa chỉ');return;}
+      code='<p style="margin:0 0 8px"><em style="font-size:15px">🔒 KENYO '+addr+'</em><br><em style="font-size:15px;color:#888">🔑 (Kenyo '+codeNum+': thông tin đã mã hóa)</em></p>';
     }else{
       code='<p style="margin:0 0 8px"><em style="font-size:15px">📍 ĐỊA CHỈ: '+addr+'</em></p>';
     }
