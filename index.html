@@ -3179,7 +3179,7 @@ function generateCode(){
   }else if(currentBlock==='title'){
     var val=document.getElementById('input-title').value.trim();
     if(!val){_setHint('⚠ Vui lòng nhập tiêu đề');return;}
-    code='<p style="margin:0 0 8px"><strong style="font-size:20px">'+(wlActive?'[WL] ':'')+val+'</strong></p>';
+    code='<p style="margin:0 0 8px"><strong style="font-size:20px">'+(wlActive?'[WL]&nbsp;':'')+val+'</strong></p>';
 
   }else if(currentBlock==='address'){
     var addr=document.getElementById('input-address').value.trim();
