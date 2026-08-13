@@ -449,7 +449,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V46</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>C6V50</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -4117,17 +4117,17 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('C6V46',size/2,size*0.82);
+    ctx.fillText('C6V50',size/2,size*0.82);
     // ✅ Trả về data URI (base64) — Chrome Android nhận được
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V46',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i C6V50',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
-        start_url:location.href,
+        start_url:'https://dangtin.678.vn/',
         display:'standalone',
         orientation:'portrait',
         background_color:'#0f1117',
@@ -4138,8 +4138,9 @@ syncMobileNav('title');
           {src:dataUrl512,sizes:'512x512',type:'image/png',purpose:'any maskable'}
         ]
       };
-      var mBlob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
-      document.getElementById('pwa-manifest').href=URL.createObjectURL(mBlob);
+      // ✅ Dùng data URI thay blob: URI — Chrome Android chấp nhận
+      var mDataUri='data:application/json;base64,'+btoa(unescape(encodeURIComponent(JSON.stringify(manifest))));
+      document.getElementById('pwa-manifest').href=mDataUri;
       var ati=document.getElementById('apple-touch-icon');
       if(ati)ati.href=dataUrl192;
     });
