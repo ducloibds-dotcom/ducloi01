@@ -1,4 +1,4 @@
-var CACHE="dangtin-c6v50";
+var CACHE="dangtin-c6v51";
 var ASSETS=[self.location.href];
 self.addEventListener("install",function(e){
   e.waitUntil(caches.open(CACHE).then(function(c){return c.addAll(ASSETS);}));
