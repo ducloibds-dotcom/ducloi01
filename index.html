@@ -2661,7 +2661,7 @@ function updateTitlePreview(){
   var p=document.getElementById('preview-title');
   if(!val){p.className='preview-empty';p.innerHTML='← Nhập tiêu đề bên trên';return;}
   p.className='preview-title';
-  p.innerHTML=wlActive?'<span class="wl-badge">[WL]</span>'+esc(val):esc(val);
+  p.innerHTML=wlActive?'<span class="wl-badge">[WL]</span> '+esc(val):esc(val);
 }
 
 // Address
