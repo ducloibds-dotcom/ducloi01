@@ -539,11 +539,7 @@
       <span>Đồng hồ</span>
       <span class="mobile-nav-dot" id="mdot-clock"></span>
     </div>
-    <div class="mobile-nav-item" data-block="images" onclick="switchBlock('images')">
-      <span class="mobile-nav-icon">🖼️</span>
-      <span>Ảnh</span>
-      <span class="mobile-nav-dot" id="mdot-images"></span>
-    </div>
+    
     <div class="mobile-nav-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
       <span class="mobile-nav-icon">📕</span>
       <span>Ảnh sổ</span>
@@ -553,6 +549,11 @@
       <span class="mobile-nav-icon">⚖️</span>
       <span>Pháp lý</span>
       <span class="mobile-nav-dot" id="mdot-phaply"></span>
+    </div>
+    <div class="mobile-nav-item" data-block="images" onclick="switchBlock('images')">
+      <span class="mobile-nav-icon">🖼️</span>
+      <span>Ảnh</span>
+      <span class="mobile-nav-dot" id="mdot-images"></span>
     </div>
     <div class="mobile-nav-item" data-block="gopy" onclick="switchBlock('gopy')">
       <span class="mobile-nav-icon">💬</span>
@@ -647,10 +648,7 @@
       <span class="block-icon">🕐</span>Đồng hồ
       <span class="block-badge done" id="badge-clock" style="display:none">✓</span>
     </div>
-    <div class="block-item" data-block="images" onclick="switchBlock('images')">
-      <span class="block-icon">🖼️</span>Ảnh
-      <span class="block-badge done" id="badge-images" style="display:none">✓</span>
-    </div>
+    
     <div class="block-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
       <span class="block-icon">📕</span>Ảnh sổ
       <span class="block-badge done" id="badge-legaldoc" style="display:none">✓</span>
@@ -658,6 +656,10 @@
     <div class="block-item" data-block="phaply" onclick="switchBlock('phaply')">
       <span class="block-icon">⚖️</span>Pháp lý
       <span class="block-badge done" id="badge-phaply" style="display:none">✓</span>
+    </div>
+    <div class="block-item" data-block="images" onclick="switchBlock('images')">
+      <span class="block-icon">🖼️</span>Ảnh
+      <span class="block-badge done" id="badge-images" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="gopy" onclick="switchBlock('gopy')">
       <span class="block-icon">💬</span>Góp ý
@@ -2590,7 +2592,7 @@ function onHistoryBtnClick(){
 }
 
 var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
-var ALL_BLOCKS=['import','video','title','address','specs','finance','map','cta','aitools','clock','images','legaldoc','phaply','gopy'];
+var ALL_BLOCKS=['import','video','title','address','specs','finance','map','cta','aitools','clock','legaldoc','phaply','images','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
 var activePlRows=0,MAX_PL=20,currentPlMau=1;
@@ -3201,9 +3203,6 @@ function generateCode(){
 
     if(typeof videoMode !== 'undefined' && videoMode === 2) {
         var fbLines = [];
-        var vt = document.getElementById('v-title').value.trim();
-        if(vt) fbLines.push('<p style="margin:0 0 8px"><strong style="font-size:15px;">🎬 ' + vt + ':</strong></p>');
-        else fbLines.push('<p style="margin:0 0 8px"><strong style="font-size:15px;">🎬 Xem video thực tế:</strong></p>');
 
         for(var i=1; i<=activeSlots; i++){
             var u = document.getElementById('url-'+i).value.trim();
