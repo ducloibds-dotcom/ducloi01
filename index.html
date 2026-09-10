@@ -603,7 +603,6 @@
     </div>
   </div>
 </div>
-
 <div class="layout">
   <!-- Sidebar -->
   <div class="sidebar">
@@ -714,6 +713,12 @@
           <div class="block-header-text">
             <h2>Khối Video</h2>
             <p>1–5 video. Hỗ trợ YouTube, Shorts và TikTok.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <div style="display:flex;gap:8px;">
+            <button id="vid-tab-1" onclick="switchVideoMode(1)" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;">🎬 Mã nhúng Web</button>
+            <button id="vid-tab-2" onclick="switchVideoMode(2)" style="flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;">🔗 Link trần, fb</button>
           </div>
         </div>
         <div class="form-group">
@@ -1459,9 +1464,8 @@
     </div>
   </div>
 </div>
-
 <script>
-var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=2,mapMode='embed',ctaMode=1;
+var wlActive=false,addrCodeActive=false,currentBlock='title',generatedCode='',activeSlots=1,currentMau=1,activeCta=2,mapMode='embed',ctaMode=1,videoMode=1;
 var blockCodes={};
 var blockTs={};   // {blockName: ts} — timestamp từng khối để merge
 var blockFormData={}; // {blockName: {...raw form values...}} — song song với blockCodes, dùng để điền lại form chính xác thay vì regex-parse HTML
@@ -2604,6 +2608,19 @@ var MAU_PLACEHOLDERS={
   2:{pub:'VD: 19,x TỶ (x LUÔN CẬP NHẬT)',price:'VD: 19,9 TỶ',preview:'VD: 19 TỶ + x TRĂM TRIỆU'}
 };
 
+function switchVideoMode(mode){
+  videoMode = mode;
+  var t1 = document.getElementById('vid-tab-1');
+  var t2 = document.getElementById('vid-tab-2');
+  var accentStyle = 'flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--accent);background:var(--accent-soft);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;';
+  var idleStyle = 'flex:1;padding:9px 10px;border-radius:var(--radius-sm);border:2px solid var(--border);background:transparent;color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;';
+  if(mode === 1){
+    t1.style.cssText = accentStyle; t2.style.cssText = idleStyle;
+  }else{
+    t1.style.cssText = idleStyle; t2.style.cssText = accentStyle;
+  }
+}
+
 function switchBlock(name){
   ALL_BLOCKS.forEach(function(b){
     var el=document.getElementById('block-'+b);
@@ -2641,12 +2658,30 @@ function addSlot(){
   document.getElementById('slot-count-hint').textContent=activeSlots>=5?'(đã đủ 5)':'(tối đa 5)';
 }
 function detectType(n){
-  var url=document.getElementById('url-'+n).value.trim();
+  var url=document.getElementById('url-'+n).value.trim().toLowerCase();
   var badge=document.getElementById('type-'+n);
   if(!url){badge.textContent='—';badge.className='video-type-badge vtype-empty';return;}
-  if(url.indexOf('tiktok.com')!==-1){badge.textContent='TikTok';badge.className='video-type-badge vtype-tt';}
-  else if(url.indexOf('youtu')!==-1){badge.textContent='YouTube';badge.className='video-type-badge vtype-yt';}
-  else{badge.textContent='?';badge.className='video-type-badge vtype-empty';}
+
+  var isLive = url.indexOf('live') !== -1 || url.indexOf('live/') !== -1;
+
+  if(url.indexOf('tiktok.com') !== -1){
+      badge.textContent = isLive ? 'TT Live' : 'TikTok';
+      badge.className = 'video-type-badge vtype-tt';
+      badge.style.background = ''; badge.style.color = ''; badge.style.borderColor = '';
+  } else if(url.indexOf('youtu') !== -1){
+      var isShorts = url.indexOf('shorts') !== -1;
+      badge.textContent = isLive ? 'YT Live' : (isShorts ? 'Shorts' : 'YouTube');
+      badge.className = 'video-type-badge vtype-yt';
+      badge.style.background = ''; badge.style.color = ''; badge.style.borderColor = '';
+  } else if(url.indexOf('facebook.com') !== -1 || url.indexOf('fb.watch') !== -1){
+      var isReel = url.indexOf('reel') !== -1;
+      badge.textContent = isLive ? 'FB Live' : (isReel ? 'FB Reel' : 'Facebook');
+      badge.className = 'video-type-badge vtype-yt';
+      // Style riêng cho FB
+      badge.style.background = '#1877F2'; badge.style.color = '#fff'; badge.style.borderColor = '#0c4a9e';
+  } else {
+      badge.textContent='?';badge.className='video-type-badge vtype-empty';
+  }
 }
 
 // Title
@@ -2790,15 +2825,15 @@ function addImgRow(){
     '</div>'+
     '<div class="video-slot-main">'+
       '<div class="video-slot-row">'+
-        '<input class="video-slot-url" id="img-link-'+n+'" type="text" placeholder="Link ảnh VD: files/assets/Thu_Muc/ten_anh_0'+n+'.jpg"/>'+
+        '<input class="video-slot-url" id="img-link-'+n+'" type="text" placeholder="Link ảnh trực tiếp ImgBB (hoặc files/assets/...)"/>'+
       '</div>'+
       '<div class="video-slot-row">'+
-        '<input class="form-input" id="img-caption-'+n+'" type="text" placeholder="Caption (VD: TÊN TÀI SẢN + PHƯỜNG)" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        '<input class="form-input" id="img-caption-'+n+'" type="text" placeholder="Caption 15px (VD: Nhà đúc kiên cố...)" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
         tamOnBtn+
       '</div>'+
       '<div class="video-slot-row">'+
-        '<input class="form-input" id="img-alt-'+n+'" type="text" placeholder="Alt" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
-        '<input class="form-input" id="img-title-'+n+'" type="text" placeholder="Title" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        '<input class="form-input" id="img-alt-'+n+'" type="text" placeholder="Alt SEO" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        '<input class="form-input" id="img-title-'+n+'" type="text" placeholder="Title SEO" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
       '</div>'+
     '</div>';
   document.getElementById('img-rows').appendChild(row);
@@ -3157,24 +3192,40 @@ function _applyFormData(block,data){
     }
   }catch(e){return false;}
 }
-
 // Generate
 function generateCode(){
   var code='';
   if(currentBlock==='video'){
     var url1=document.getElementById('url-1').value.trim();
     if(!url1){_setHint('⚠ Cần ít nhất 1 link video');return;}
-    var lines=['<p>&nbsp;</p>','<!-- KHỐI VIDEO (kenyo-yt-config) -->','<div id="kenyo-yt-config"','  data-video="'+url1+'"'];
-    for(var i=2;i<=activeSlots;i++){var u=document.getElementById('url-'+i).value.trim();if(u)lines.push('  data-video-'+i+'="'+u+'"');}
-    var vt=document.getElementById('v-title').value.trim();
-    var vd=document.getElementById('v-desc').value.trim();
-    var vk=document.getElementById('v-keywords').value.trim();
-    if(vt)lines.push('  data-title="'+vt+'"');
-    if(vd)lines.push('  data-description="'+vd+'"');
-    if(vk)lines.push('  data-keywords="'+vk+'"');
-    for(var j=2;j<=activeSlots;j++){var lbl=document.getElementById('label-'+j).value.trim();var uj=document.getElementById('url-'+j).value.trim();if(lbl&&uj)lines.push('  data-label-'+j+'="'+lbl+'"');}
-    lines.push('>&nbsp;</div>');
-    code=lines.join('\n');
+
+    if(typeof videoMode !== 'undefined' && videoMode === 2) {
+        var fbLines = [];
+        var vt = document.getElementById('v-title').value.trim();
+        if(vt) fbLines.push('<p style="margin:0 0 8px"><strong style="font-size:15px;">🎬 ' + vt + ':</strong></p>');
+        else fbLines.push('<p style="margin:0 0 8px"><strong style="font-size:15px;">🎬 Xem video thực tế:</strong></p>');
+
+        for(var i=1; i<=activeSlots; i++){
+            var u = document.getElementById('url-'+i).value.trim();
+            if(!u) continue;
+            var lbl = (i===1) ? "" : document.getElementById('label-'+i).value.trim();
+            if(lbl) fbLines.push('<p style="margin:0 0 4px"><em style="font-size:15px;">' + lbl + ': ' + u + '</em></p>');
+            else fbLines.push('<p style="margin:0 0 4px"><em style="font-size:15px;">' + u + '</em></p>');
+        }
+        code = fbLines.join('\n');
+    } else {
+        var lines=['<p>&nbsp;</p>','<!-- KHỐI VIDEO (kenyo-yt-config) -->','<div id="kenyo-yt-config"','  data-video="'+url1+'"'];
+        for(var i=2;i<=activeSlots;i++){var u=document.getElementById('url-'+i).value.trim();if(u)lines.push('  data-video-'+i+'="'+u+'"');}
+        var vt=document.getElementById('v-title').value.trim();
+        var vd=document.getElementById('v-desc').value.trim();
+        var vk=document.getElementById('v-keywords').value.trim();
+        if(vt)lines.push('  data-title="'+vt+'"');
+        if(vd)lines.push('  data-description="'+vd+'"');
+        if(vk)lines.push('  data-keywords="'+vk+'"');
+        for(var j=2;j<=activeSlots;j++){var lbl=document.getElementById('label-'+j).value.trim();var uj=document.getElementById('url-'+j).value.trim();if(lbl&&uj)lines.push('  data-label-'+j+'="'+lbl+'"');}
+        lines.push('>&nbsp;</div>');
+        code=lines.join('\n');
+    }
 
   }else if(currentBlock==='title'){
     var val=document.getElementById('input-title').value.trim();
@@ -3248,10 +3299,9 @@ function generateCode(){
     ml.push('    </iframe>');
     ml.push('</div>');
     code=ml.join('\n');
-    } // end else embed
+    }
   }else if(currentBlock==='cta'){
     if(ctaMode===2){
-      // Tùy chọn 2: text thuần, hiện số điện thoại thẳng
       var fbLines=['<p style="margin:0 0 8px"><strong style="font-size:15px;">📞 Gọi ngay để biết thêm thông tin:</strong></p>'];
       var hasFbAny=false;
       for(var fc=1;fc<=activeCta;fc++){
@@ -3296,10 +3346,10 @@ function generateCode(){
     ctaLines.push('');
     ctaLines.push('<!-- END: KHỐI LIÊN HỆ -->');
     code=ctaLines.join('\n');
-    } // end ctaMode===1
+    }
 
   }else if(currentBlock==='images'){
-    var imgLines=['<!-- KHỐI ẢNH -->'];
+    var imgLines=['<!-- KHỐI ẢNH (SEO IMGBB) -->'];
     var hasImgAny=false;
     for(var ii=1;ii<=activeImgSlots;ii++){
       var linkEl=document.getElementById('img-link-'+ii);
@@ -3310,11 +3360,16 @@ function generateCode(){
       if(!link)continue;
       hasImgAny=true;
       link=link.replace(/^\/+/,'');
+      
       var cap=(document.getElementById('img-caption-'+ii).value||'').trim();
       var alt=(document.getElementById('img-alt-'+ii).value||'').trim();
       var ttl=(document.getElementById('img-title-'+ii).value||'').trim();
+      
       imgLines.push('');
-      imgLines.push('<p style="font-size:15px;font-weight:bold;text-decoration:underline;">'+cap+'</p>');
+      if(cap) {
+          imgLines.push('<p style="font-size:15px;font-weight:bold;text-decoration:underline;">'+cap+'</p>');
+      }
+      
       imgLines.push('<img src="'+link+'" alt="'+alt+'" title="'+ttl+'" loading="lazy" style="width:100%;height:auto;margin-bottom:20px;" />');
     }
     if(!hasImgAny){_setHint('⚠ Vui lòng thêm ít nhất 1 ảnh (link)');return;}
@@ -3460,7 +3515,6 @@ function generateCode(){
     pushHistory(currentBlock,code);
     updateHistoryBtn(currentBlock);
     _autoSave();
-    // Push khối này lên cloud — delta sync
     _cloudBlockSave(currentBlock,code,_ts,_formData);
     showCode(code);
     markDone(currentBlock);
@@ -3529,7 +3583,6 @@ function showCombined(selected){
   showCode(combined);
   var count=selected?selected.length:ALL_BLOCKS.filter(function(b){return blockCodes[b];}).length;
   _setHint('📦 Đang xem CODE GỘP ('+count+' khối) — bấm Copy để lấy toàn bộ');
-  // Tự động mở sheet trên mobile sau khi gộp
   if(window.innerWidth<=767){
     openOutputSheet();
   }
@@ -3538,7 +3591,6 @@ function showCombined(selected){
 function markDone(name){
   var badge=document.getElementById('badge-'+name);
   if(badge){badge.textContent='✓';badge.className='block-badge done';badge.style.display='';}
-  // Mark done on ALL matching elements (sidebar + mobile nav)
   document.querySelectorAll('[data-block="'+name+'"]').forEach(function(item){
     item.classList.add('done');
   });
@@ -3792,15 +3844,12 @@ function decodeHtmlEntities(str){
 }
 function getElText(el){
   if(!el)return '';
-  // innerText không hoạt động trong DOMParser offline → dùng innerHTML → decode
   var html=el.innerHTML||'';
-  // replace <br> thành newline
   html=html.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<[^>]+>/g,'');
   return decodeHtmlEntities(html).replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
 }
 function extractSpecsFromDoc(doc,site){
   if(site==='alonhadat'){
-    // thử nhiều selector
     var selectors=[
       'article.property p[itemprop="description"]',
       'article.property [itemprop="description"]',
@@ -3876,7 +3925,6 @@ function smartImport(){
   var desc=ogDescs[0]||'';
   var combinedText=title+'\n'+desc+'\n'+bodyText;
 
-  // Địa chỉ: Alonhadat có thẻ p.old-address trong article chứa địa chỉ đầy đủ
   var address='';
   if(site==='alonhadat'){
     var addrEl=doc.querySelector('article.property p.old-address');
@@ -3889,8 +3937,6 @@ function smartImport(){
   if(!address)address=extractAddress(combinedText);
 
   var price=extractPrice(combinedText);
-
-  // Thông số: ưu tiên lấy toàn bộ nội dung mô tả từ doc
   var specs=extractSpecsFromDoc(doc,site);
   if(!specs)specs=extractSpecs(bodyText);
 
@@ -3995,7 +4041,6 @@ function syncSheetContent() {
     codeOut.style.display = 'block';
     codeOut.textContent = generatedCode;
 
-    // sync preview frame
     var doc = '<!DOCTYPE html><html><head><meta charset="utf-8">' +
       '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css">' +
       '<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#111;line-height:1.6;padding:16px;margin:0;background:#fff;}' +
@@ -4006,7 +4051,6 @@ function syncSheetContent() {
     previewEmpty.style.display = 'none';
     previewFrame.style.display = 'block';
 
-    // update button label
     if (outputBtn) {
       outputBtn.innerHTML = '📋 Xem code <span style="background:rgba(255,255,255,.25);border-radius:4px;font-size:11px;padding:1px 5px;margin-left:4px;">✓</span>';
     }
@@ -4027,7 +4071,6 @@ function syncMobileNav(name) {
     var b = item.getAttribute('data-block');
     item.classList.toggle('active', b === name);
   });
-  // scroll active nav item into view
   var activeItem = document.querySelector('.mobile-nav-item[data-block="' + name + '"]');
   if (activeItem) {
     activeItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -4039,7 +4082,6 @@ function markMobileDone(name) {
   if (item) item.classList.add('done');
 }
 
-// Patch markDone to also update mobile
 var _origMarkDone = markDone;
 markDone = function(name) {
   _origMarkDone(name);
@@ -4047,7 +4089,6 @@ markDone = function(name) {
   syncSheetContent();
 };
 
-// Patch showCode to sync sheet
 var _origShowCode = showCode;
 showCode = function(code) {
   _origShowCode(code);
@@ -4056,11 +4097,6 @@ showCode = function(code) {
 
 updateCopyButtons();
 
-// switchBlock now handles both sidebar + mobile nav natively (no patch needed)
-
-
-
-// Swipe down to close sheet
 (function() {
   var panel = document.querySelector('.sheet-panel');
   if (!panel) return;
@@ -4142,8 +4178,6 @@ document.getElementById('video-slots').addEventListener('paste', function(e) {
     var currentSlot = currentSlotMatch ? parseInt(currentSlotMatch[0]) : 1;
     detectType(currentSlot);
     var linkIndex = 1;
-    var linkIndex = 1;
-    // Vòng lặp tính từ slot hiện tại (currentSlot) cộng thêm 1
     for (var i = currentSlot + 1; i <= 5; i++) {
         if(linkIndex >= links.length) break;
         if(activeSlots < i) addSlot();
@@ -4154,6 +4188,7 @@ document.getElementById('video-slots').addEventListener('paste', function(e) {
   }
 });
 // ====================================================
+
 // Init
 selectMau(1);
 addImgRow();
@@ -4163,9 +4198,6 @@ syncMobileNav('title');
 
 // ── PWA: Manifest + Service Worker ──
 (function initPWA(){
-  // Dùng toDataURL (base64) thay vì toBlob+createObjectURL
-  // Chrome Android chấp nhận data: URI trong manifest icon,
-  // còn blob: URI bị từ chối vì không phải same-origin cố định.
   function makeIconDataURL(size,cb){
     var c=document.createElement('canvas');
     c.width=c.height=size;
@@ -4181,7 +4213,6 @@ syncMobileNav('title');
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
     ctx.fillText('V52',size/2,size*0.82);
-    // ✅ Trả về data URI (base64) — Chrome Android nhận được
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
@@ -4201,22 +4232,13 @@ syncMobileNav('title');
           {src:dataUrl512,sizes:'512x512',type:'image/png',purpose:'any maskable'}
         ]
       };
-      // ✅ Dùng data URI thay blob: URI — Chrome Android chấp nhận
       var mDataUri='data:application/json;base64,'+btoa(unescape(encodeURIComponent(JSON.stringify(manifest))));
       document.getElementById('pwa-manifest').href=mDataUri;
       var ati=document.getElementById('apple-touch-icon');
       if(ati)ati.href=dataUrl192;
     });
   });
-  // ── Service Worker ──
-  // Vì dangtin.678.vn là origin thật (HTTPS), SW đăng ký được —
-  // nhưng KHÔNG thể dùng blob: URL làm script URL cho SW.
-  // Workaround: fetch chính trang rồi dùng Response để tạo SW
-  // không khả thi ở đây. Giải pháp đúng: đặt sw.js riêng trên server.
-  // Tạm thời bỏ SW → PWA vẫn installable nhờ manifest hợp lệ.
-  // (Khi có sw.js thật trên server, uncommit đoạn dưới và bỏ return)
   if('serviceWorker' in navigator){
-    // Thử đăng ký /sw.js nếu file đó tồn tại trên server
     fetch('/sw.js',{method:'HEAD'}).then(function(r){
       if(r.ok){
         navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(function(){});
@@ -4224,7 +4246,6 @@ syncMobileNav('title');
     }).catch(function(){});
   }
 })();
-
 </script>
 </body>
 </html>
