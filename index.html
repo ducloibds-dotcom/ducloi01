@@ -4091,6 +4091,69 @@ updateCopyButtons();
   }, { passive: true });
 })();
 
+// ====== BẮT SỰ KIỆN DÁN HÀNG LOẠT (BULK PASTE) ======
+
+// 1. Cho Khối Ảnh (Images)
+document.getElementById('img-rows').addEventListener('paste', function(e) {
+  var target = e.target;
+  if (target && target.tagName === 'INPUT' && target.id.startsWith('img-link-')) {
+    var pasteText = (e.clipboardData || window.clipboardData).getData('text');
+    var links = pasteText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+    if (links.length <= 1) return;
+    e.preventDefault();
+    target.value = links[0];
+    for (var i = 1; i < links.length; i++) {
+      if (activeImgSlots < MAX_IMG) {
+        addImgRow();
+        document.getElementById('img-link-' + activeImgSlots).value = links[i];
+      }
+    }
+  }
+});
+
+// 2. Cho Khối Ảnh Sổ (Legal Docs)
+document.getElementById('legal-img-rows').addEventListener('paste', function(e) {
+  var target = e.target;
+  if (target && target.tagName === 'INPUT' && target.id.startsWith('legal-img-link-')) {
+    var pasteText = (e.clipboardData || window.clipboardData).getData('text');
+    var links = pasteText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+    if (links.length <= 1) return;
+    e.preventDefault();
+    target.value = links[0];
+    for (var i = 1; i < links.length; i++) {
+      if (activeLegalImgSlots < MAX_LEGAL_IMG) {
+        addLegalImgRow();
+        document.getElementById('legal-img-link-' + activeLegalImgSlots).value = links[i];
+      }
+    }
+  }
+});
+
+// 3. Cho Khối Video
+document.getElementById('video-slots').addEventListener('paste', function(e) {
+  var target = e.target;
+  if (target && target.tagName === 'INPUT' && target.id.startsWith('url-')) {
+    var pasteText = (e.clipboardData || window.clipboardData).getData('text');
+    var links = pasteText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+    if (links.length <= 1) return;
+    e.preventDefault();
+    target.value = links[0];
+    var currentSlotMatch = target.id.match(/\d+/);
+    var currentSlot = currentSlotMatch ? parseInt(currentSlotMatch[0]) : 1;
+    detectType(currentSlot);
+    var linkIndex = 1;
+    var linkIndex = 1;
+    // Vòng lặp tính từ slot hiện tại (currentSlot) cộng thêm 1
+    for (var i = currentSlot + 1; i <= 5; i++) {
+        if(linkIndex >= links.length) break;
+        if(activeSlots < i) addSlot();
+        document.getElementById('url-' + i).value = links[linkIndex];
+        detectType(i);
+        linkIndex++;
+    }
+  }
+});
+// ====================================================
 // Init
 selectMau(1);
 addImgRow();
