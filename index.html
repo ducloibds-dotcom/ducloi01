@@ -519,6 +519,11 @@
       <span>Tài chính</span>
       <span class="mobile-nav-dot" id="mdot-finance"></span>
     </div>
+     <div class="mobile-nav-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
+      <span class="mobile-nav-icon">📕</span>
+      <span>Ảnh sổ</span>
+      <span class="mobile-nav-dot" id="mdot-legaldoc"></span>
+    </div>
     <div class="mobile-nav-item" data-block="map" onclick="switchBlock('map')">
       <span class="mobile-nav-icon">🗺️</span>
       <span>Bản đồ, fb</span>
@@ -540,11 +545,7 @@
       <span class="mobile-nav-dot" id="mdot-clock"></span>
     </div>
     
-    <div class="mobile-nav-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
-      <span class="mobile-nav-icon">📕</span>
-      <span>Ảnh sổ</span>
-      <span class="mobile-nav-dot" id="mdot-legaldoc"></span>
-    </div>
+   
     <div class="mobile-nav-item" data-block="phaply" onclick="switchBlock('phaply')">
       <span class="mobile-nav-icon">⚖️</span>
       <span>Pháp lý</span>
@@ -632,6 +633,10 @@
       <span class="block-icon">💵</span>Tài chính
       <span class="block-badge done" id="badge-finance" style="display:none">✓</span>
     </div>
+    <div class="block-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
+      <span class="block-icon">📕</span>Ảnh sổ
+      <span class="block-badge done" id="badge-legaldoc" style="display:none">✓</span>
+    </div>
     <div class="block-item" data-block="map" onclick="switchBlock('map')">
       <span class="block-icon">🗺️</span>Bản đồ, fb
       <span class="block-badge done" id="badge-map" style="display:none">✓</span>
@@ -649,10 +654,7 @@
       <span class="block-badge done" id="badge-clock" style="display:none">✓</span>
     </div>
     
-    <div class="block-item" data-block="legaldoc" onclick="switchBlock('legaldoc')">
-      <span class="block-icon">📕</span>Ảnh sổ
-      <span class="block-badge done" id="badge-legaldoc" style="display:none">✓</span>
-    </div>
+    
     <div class="block-item" data-block="phaply" onclick="switchBlock('phaply')">
       <span class="block-icon">⚖️</span>Pháp lý
       <span class="block-badge done" id="badge-phaply" style="display:none">✓</span>
@@ -2592,7 +2594,7 @@ function onHistoryBtnClick(){
 }
 
 var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
-var ALL_BLOCKS=['import','video','title','address','specs','finance','map','cta','aitools','clock','legaldoc','phaply','images','gopy'];
+var ALL_BLOCKS=['import','video','title','address','specs','finance','legaldoc','map','cta','aitools','clock','phaply','images','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
 var activePlRows=0,MAX_PL=20,currentPlMau=1;
