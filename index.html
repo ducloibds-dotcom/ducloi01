@@ -3258,6 +3258,10 @@ function generateCode(){
     if(!pub||!price||!prev){_setHint('⚠ Vui lòng điền đủ 3 ô giá');return;}
     var fl=[];
     fl.push('<p style="font-size:20pt;font-weight:bold;color:#000;margin:20px 0 10px;">');
+    fl.push('<!-- Bạn bị phát hiện đang xem source nguồn -->');
+    fl.push('<!-- Chúng tôi không mã hóa nhưng biết điều đó -->');
+    fl.push('<!-- Hành vi ăn cắp thông tin là không tốt! -->');
+    fl.push('<p style="font-size:20pt;font-weight:bold;color:#000;margin:20px 0 10px;">');
     fl.push('    💵 GIÁ BÁN: '+pub);
     fl.push('</p>');
     fl.push('');
@@ -3399,6 +3403,9 @@ function generateCode(){
     var ownerName=document.getElementById('legal-owner-name').value.trim();
     var ownerPhone=document.getElementById('legal-owner-phone').value.trim();
     var dl=[];
+    dl.push('<!-- Bạn bị phát hiện đang xem source nguồn -->');
+    dl.push('<!-- Chúng tôi không mã hóa nhưng biết điều đó -->');
+    dl.push('<!-- Hành vi ăn cắp thông tin là không tốt! -->');
     dl.push('<div class="contact-area">');
     if(currentLegalMau===2&&(ownerName||ownerPhone)){
       var attrLines=['    <div class="btn-price js-open-popup"','         data-type="doc"'];
@@ -3440,6 +3447,10 @@ function generateCode(){
     var plOwnerName=document.getElementById('pl-owner-name').value.trim();
     var plOwnerPhone=document.getElementById('pl-owner-phone').value.trim();
     var pl=[];
+    pl.push('<div class="contact-area" style="margin:40px 0;">');
+    pl.push('<!-- Bạn bị phát hiện đang xem source nguồn -->');
+    pl.push('<!-- Chúng tôi không mã hóa nhưng biết điều đó -->');
+    pl.push('<!-- Hành vi ăn cắp thông tin là không tốt! -->');
     pl.push('<div class="contact-area" style="margin:40px 0;">');
     if(currentPlMau===2&&(plOwnerName||plOwnerPhone)){
       var plAttrLines=['    <div class="btn-price js-open-popup"','         data-type="doc2"'];
