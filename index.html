@@ -807,7 +807,7 @@
           <textarea class="form-input" id="v-keywords" placeholder="VD: nhà xưởng An Hạ, nhà xưởng Bình Chánh..."></textarea>
         </div>
         <div class="form-group">
-          <label class="form-label">Giỏ hàng BĐS <span class="form-label-sub">tùy chọn · Nhập tối đa 30 sản phẩm · gắn với video đầu tiên</span></label>
+          <label class="form-label">Giỏ hàng BĐS <span class="form-label-sub">tùy chọn · Nhập tối đa 30 sản phẩm · gắn với video đầu tiên · tin không có video thì bỏ trống link video, chỉ nhập giỏ</span></label>
           <div class="video-slots" id="cart-rows"></div>
           <button class="add-slot-btn" id="cart-add-btn" type="button" onclick="addCartRow()">
             + Thêm sản phẩm <span id="cart-count" style="margin-left:4px;font-size:11px;color:var(--text-dim)">(0/30)</span>
@@ -3363,9 +3363,17 @@ function generateCode(){
   var code='';
   if(currentBlock==='video'){
     var url1=document.getElementById('url-1').value.trim();
-    if(!url1){_setHint('⚠ Cần ít nhất 1 link video');return;}
+    var _ci0=_cartItems();
+    if(!url1&&!_ci0.length){_setHint('⚠ Cần ít nhất 1 link video (hoặc nhập giỏ hàng BĐS nếu tin không có video)');return;}
 
-    if(typeof videoMode !== 'undefined' && videoMode === 2) {
+    if(!url1){
+        /* Tin KHÔNG có video: chỉ xuất danh sách link giỏ (khối giỏ trên web đọc từ các link trong bài) */
+        if(typeof videoMode !== 'undefined' && videoMode === 2){
+            code=_cartFbLines(_ci0).join('\n');
+        }else{
+            code=['<p>&nbsp;</p>','<!-- KHỐI GIỎ HÀNG (tin không video) -->'].concat(_cartSeoLines(_ci0)).join('\n');
+        }
+    } else if(typeof videoMode !== 'undefined' && videoMode === 2) {
         var fbLines = [];
 
         for(var i=1; i<=activeSlots; i++){
