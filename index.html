@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="vi">
 <head>
 <meta charset="UTF-8">
@@ -805,6 +805,23 @@
         <div class="form-group">
           <label class="form-label">Keywords <span class="form-label-sub">phân cách bằng dấu phẩy</span></label>
           <textarea class="form-input" id="v-keywords" placeholder="VD: nhà xưởng An Hạ, nhà xưởng Bình Chánh..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giỏ hàng BĐS <span class="form-label-sub">tùy chọn · Nhập tối đa 30 sản phẩm · gắn với video đầu tiên</span></label>
+          <div class="video-slots" id="cart-rows"></div>
+          <button class="add-slot-btn" id="cart-add-btn" type="button" onclick="addCartRow()">
+            + Thêm sản phẩm <span id="cart-count" style="margin-left:4px;font-size:11px;color:var(--text-dim)">(0/30)</span>
+          </button>
+          <div id="cart-warn" style="display:none;margin-top:6px;font-size:12px;line-height:1.5;color:#ef4444;"></div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row active" id="cart-seo-toggle" onclick="toggleCartSeo()">
+            <div class="toggle-switch"></div>
+            <div class="toggle-label">
+              <strong>Link giỏ hàng cho SEO</strong>
+              <span>Thêm danh sách link thật dưới video (chỉ chế độ Mã nhúng Web)</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -2654,6 +2671,149 @@ function switchBlock(name){
 }
 
 // Video
+/* ── GIỎ HÀNG (đi cùng khối KENYO VUOT BAI VA GIO HANG 2) ── */
+var CART_MAX=30,cartRowN=0,cartSeoActive=true;
+var CART_HOSTS=['kenyo.vn','678.vn','alonhadat.com.vn','batdongsan.com.vn','chotot.com','nha.chotot.com','shopee.vn','shp.ee'];
+function _cartEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function _cartNorm(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u.replace(/^\/+/,'');return u;}
+function _cartHost(u){try{return new URL(u).hostname.toLowerCase().replace(/^www\./,'');}catch(e){return '';}}
+function _cartHostOk(u){return CART_HOSTS.indexOf(_cartHost(u))!==-1;}
+function _cartRows(){
+  var out=[],box=document.getElementById('cart-rows');
+  if(!box)return out;
+  for(var i=0;i<box.children.length;i++){
+    var id=box.children[i].id.replace('cart-row-','');
+    var nm=document.getElementById('cart-name-'+id),lk=document.getElementById('cart-link-'+id);
+    out.push({n:nm?nm.value.trim():'',l:lk?lk.value.trim():''});
+  }
+  return out;
+}
+function _cartRaw(){return _cartRows().filter(function(r){return r.n||r.l;});}
+function _cartItems(){
+  var r=_cartRows(),out=[],seen={};
+  for(var i=0;i<r.length;i++){
+    var u=_cartNorm(r[i].l);
+    if(!u||!_cartHostOk(u)||seen[u])continue;
+    seen[u]=1;out.push({n:r[i].n,u:u});
+    if(out.length>=CART_MAX)break;
+  }
+  return out;
+}
+function updateCartCount(){
+  var box=document.getElementById('cart-rows');
+  if(!box)return;
+  var rows=_cartRows(),valid=0,bad=0,noLink=0,dup=0,noName=0,seen={};
+  for(var i=0;i<rows.length;i++){
+    var num=box.children[i].querySelector('.video-slot-num');
+    if(num)num.textContent=i+1;
+    var u=_cartNorm(rows[i].l);
+    if(!u){if(rows[i].n)noLink++;continue;}
+    if(!_cartHostOk(u)){bad++;continue;}
+    if(seen[u]){dup++;continue;}
+    seen[u]=1;valid++;
+    if(!rows[i].n)noName++;
+  }
+  document.getElementById('cart-count').textContent='('+valid+'/'+CART_MAX+')';
+  document.getElementById('cart-add-btn').disabled=rows.length>=CART_MAX;
+  var w=[];
+  if(noLink)w.push('⚠ '+noLink+' dòng có tên nhưng thiếu link — sẽ bị bỏ');
+  if(bad)w.push('⚠ '+bad+' link không thuộc tên miền hỗ trợ ('+CART_HOSTS.join(', ')+') — sẽ bị bỏ');
+  if(dup)w.push('⚠ '+dup+' link trùng — chỉ giữ 1');
+  if(noName)w.push('ℹ '+noName+' dòng chưa có tên — nên nhập tên để link SEO có chữ mô tả');
+  var we=document.getElementById('cart-warn');
+  we.style.display=w.length?'block':'none';
+  we.innerHTML=w.map(_cartEsc).join('<br>');
+}
+function addCartRow(name,link){
+  var box=document.getElementById('cart-rows');
+  if(!box||box.children.length>=CART_MAX)return;
+  cartRowN++;
+  var id=cartRowN;
+  var row=document.createElement('div');
+  row.className='video-slot';row.id='cart-row-'+id;
+  row.innerHTML='<div class="video-slot-num">'+(box.children.length+1)+'</div>'+
+    '<div class="video-slot-main">'+
+      '<div class="video-slot-row"><input class="video-slot-url" id="cart-name-'+id+'" type="text" placeholder="Tên sản phẩm (VD: Nhà xưởng An Hạ)" oninput="updateCartCount()"/></div>'+
+      '<div class="video-slot-row"><input class="video-slot-url" id="cart-link-'+id+'" type="text" placeholder="Link sản phẩm (VD: https://kenyo.vn/...-id763.html)" oninput="updateCartCount()"/>'+
+      '<button type="button" onclick="removeCartRow('+id+')" title="Xóa dòng" style="flex-shrink:0;background:transparent;border:1px solid var(--border);color:var(--text-muted);border-radius:var(--radius-sm);padding:8px 10px;cursor:pointer;">✕</button></div>'+
+    '</div>';
+  box.appendChild(row);
+  if(name)document.getElementById('cart-name-'+id).value=name;
+  if(link)document.getElementById('cart-link-'+id).value=link;
+  updateCartCount();
+}
+function removeCartRow(id){
+  var r=document.getElementById('cart-row-'+id);
+  if(r&&r.parentNode)r.parentNode.removeChild(r);
+  updateCartCount();
+}
+function clearCartRows(){
+  var box=document.getElementById('cart-rows');
+  if(box)box.innerHTML='';
+  updateCartCount();
+}
+function toggleCartSeo(){
+  cartSeoActive=!cartSeoActive;
+  var t=document.getElementById('cart-seo-toggle');
+  cartSeoActive?t.classList.add('active'):t.classList.remove('active');
+}
+function _cartReset(){
+  clearCartRows();
+  if(!cartSeoActive)toggleCartSeo();
+}
+function _applyCartData(data){
+  clearCartRows();
+  var c=data.cart||[];
+  for(var i=0;i<c.length&&i<CART_MAX;i++)addCartRow(c[i].n,c[i].l);
+  var want=(data.cartSeo===undefined)?true:!!data.cartSeo;
+  if(want!==cartSeoActive)toggleCartSeo();
+  updateCartCount();
+}
+function _cartDataAttr(items){
+  return items.map(function(c){
+    var u=c.u.replace(/\|/g,'%7C').replace(/;;/g,'%3B%3B');
+    var n=c.n.replace(/\s+/g,' ').replace(/;;+/g,';');
+    return (n?_cartEsc(n)+' | ':'')+_cartEsc(u);
+  }).join(' ;; ');
+}
+function _cartFbLines(items){
+  return items.map(function(c){
+    return '<p class="kenyo-cart-line" style="margin:0 0 4px"><em style="font-size:15px;">'+(c.n?_cartEsc(c.n)+' : ':'')+_cartEsc(c.u)+'</em></p>';
+  });
+}
+function _cartSeoLines(items){
+  var l=['<ul class="kenyo-cart-seo" style="margin:8px 0 0;padding-left:20px;font-size:15px;">'];
+  items.forEach(function(c,i){
+    var h=_cartHost(c.u),own=(h==='kenyo.vn'||h==='678.vn');
+    l.push('  <li><a href="'+_cartEsc(c.u)+'" target="_blank" rel="'+(own?'noopener':'noopener nofollow')+'">'+_cartEsc(c.n||c.u)+'</a></li>');
+  });
+  l.push('</ul>');
+  return l;
+}
+function extractCart(doc){
+  var out=[],seen={};
+  function add(n,l){
+    var u=_cartNorm(l);
+    if(!u||!_cartHostOk(u)||seen[u]||out.length>=CART_MAX)return;
+    seen[u]=1;out.push({n:(n||'').trim(),u:u});
+  }
+  var cfg=doc.getElementById('kenyo-yt-config');
+  if(cfg){
+    var blob=cfg.getAttribute('data-cart')||'';
+    if(blob)blob.split(';;').forEach(function(p){var b=p.lastIndexOf('|');if(b!==-1)add(p.slice(0,b),p.slice(b+1));else add('',p);});
+  }
+  doc.querySelectorAll('.kenyo-cart-seo a').forEach(function(a){
+    var t=(a.textContent||'').trim();
+    add(/^https?:\/\//i.test(t)?'':t,a.getAttribute('href')||'');
+  });
+  doc.querySelectorAll('.kenyo-cart-line').forEach(function(p){
+    var t=(p.textContent||'').trim();
+    var m=t.match(/^(?:(.*?)\s*:\s*)?(https?:\/\/\S+)$/);
+    if(m)add(m[1]||'',m[2]);
+  });
+  return out;
+}
+
 function addSlot(){
   if(activeSlots>=5)return;
   activeSlots++;
@@ -2990,7 +3150,8 @@ function _getFormData(block){
         return {urls:urls,labels:labels,
           vTitle:document.getElementById('v-title').value.trim(),
           vDesc:document.getElementById('v-desc').value.trim(),
-          vKeywords:document.getElementById('v-keywords').value.trim()};
+          vKeywords:document.getElementById('v-keywords').value.trim(),
+          cart:_cartRaw(),cartSeo:cartSeoActive};
       }
       case 'title':
         return {val:document.getElementById('input-title').value.trim(),wl:wlActive};
@@ -3088,6 +3249,7 @@ function _applyFormData(block,data){
         document.getElementById('v-title').value=data.vTitle||'';
         document.getElementById('v-desc').value=data.vDesc||'';
         document.getElementById('v-keywords').value=data.vKeywords||'';
+        _applyCartData(data);
         return true;
       }
       case 'title':
@@ -3212,6 +3374,7 @@ function generateCode(){
             var lbl = (i===1) ? "" : document.getElementById('label-'+i).value.trim();
             if(lbl) fbLines.push('<p style="margin:0 0 4px"><em style="font-size:15px;">' + lbl + ': ' + u + '</em></p>');
             else fbLines.push('<p style="margin:0 0 4px"><em style="font-size:15px;">' + u + '</em></p>');
+            if(i===1) _cartFbLines(_cartItems()).forEach(function(x){ fbLines.push(x); });
         }
         code = fbLines.join('\n');
     } else {
@@ -3224,7 +3387,10 @@ function generateCode(){
         if(vd)lines.push('  data-description="'+vd+'"');
         if(vk)lines.push('  data-keywords="'+vk+'"');
         for(var j=2;j<=activeSlots;j++){var lbl=document.getElementById('label-'+j).value.trim();var uj=document.getElementById('url-'+j).value.trim();if(lbl&&uj)lines.push('  data-label-'+j+'="'+lbl+'"');}
+        var _ci=_cartItems();
+        if(_ci.length)lines.push('  data-cart="'+_cartDataAttr(_ci)+'"');
         lines.push('>&nbsp;</div>');
+        if(_ci.length&&cartSeoActive)_cartSeoLines(_ci).forEach(function(x){lines.push(x);});
         code=lines.join('\n');
     }
 
@@ -3706,6 +3872,7 @@ function resetBlock(){
     document.getElementById('v-title').value='';
     document.getElementById('v-desc').value='';
     document.getElementById('v-keywords').value='';
+    _cartReset();
     activeSlots=1;document.getElementById('add-slot-btn').disabled=false;
     document.getElementById('slot-count-hint').textContent='(tối đa 5)';
   }else if(currentBlock==='title'){
@@ -3953,6 +4120,7 @@ function smartImport(){
   var ogImages=getMetaContentAll(doc,'og:image');
   var images=extractImages(doc,ogImages);
   var videos=extractVideos(doc,raw);
+  var cartIn=extractCart(doc);
   var phones=extractPhones(combinedText);
   var mapSrc=extractMapSrc(doc);
 
@@ -3981,6 +4149,10 @@ function smartImport(){
       detectType(vi+1);
     }
   }
+  if(cartIn.length){
+    clearCartRows();
+    cartIn.forEach(function(c){addCartRow(c.n,c.u);});
+  }
   if(phones.length){
     document.getElementById('cta-phone-1').value=phones[0];
     for(var phi=1;phi<phones.length&&phi<5;phi++){
@@ -3995,7 +4167,7 @@ function smartImport(){
 
   var rows=[
     ['Tiêu đề',!!title],['Địa chỉ',!!address],['Giá',!!price],['Thông số',!!specs],
-    ['Ảnh ('+images.length+')',images.length>0],['Video ('+videos.length+')',videos.length>0],
+    ['Ảnh ('+images.length+')',images.length>0],['Video ('+videos.length+')',videos.length>0],['Giỏ hàng ('+cartIn.length+')',cartIn.length>0],
     ['Điện thoại',phones.length>0],['Bản đồ',!!mapSrc]
   ];
   summaryEl.innerHTML=rows.map(function(r){
