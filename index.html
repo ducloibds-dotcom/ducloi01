@@ -445,11 +445,27 @@
   @media (min-width:1025px){
     .gen-hint{display:block;}
   }
+
+  /* ── PATCH: đánh số, popup danh sách tin ── */
+  .tab-num{font-weight:700;color:var(--accent);margin-right:3px;font-size:11px;opacity:.9;}
+  .mobile-nav-item .tab-num{margin-right:2px;}
+  .merge-num{font-weight:700;color:var(--tag-wl);min-width:22px;font-size:12px;}
+  .pl-item{display:flex;align-items:stretch;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0;}
+  .pl-item.cur{border-color:var(--accent);background:rgba(59,130,246,.08);}
+  .pl-main{flex:1;min-width:0;display:flex;gap:10px;padding:9px 10px;cursor:pointer;align-items:flex-start;}
+  .pl-main:hover{background:var(--surface2);}
+  .pl-num{min-width:26px;height:22px;padding:0 5px;border-radius:5px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pl-acts{display:flex;flex-shrink:0;border-left:1px solid var(--border);}
+  .pl-btn{background:transparent;border:none;padding:0 12px;cursor:pointer;font-size:14px;color:var(--text-dim);transition:color .12s,background .12s;}
+  .pl-btn:hover,.pl-btn:active{color:var(--text);background:var(--surface2);}
+  .pl-btn.del:hover,.pl-btn.del:active{color:#f87171;background:rgba(248,113,113,.1);}
+  .postlist-tools .btn-session .session-label{display:inline !important;}
+  .login-overlay,.share-overlay{z-index:1300 !important;}
 </style>
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V52</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V56</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -463,37 +479,49 @@
       <button onclick="genNewPostId()" title="Tạo mã mới" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">🔄</button>
       <button onclick="openPostList()" title="Danh sách tin" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:11px;padding:0;">📋</button>
     </div>
-    <button class="btn-session" onclick="saveSession()" title="Lưu phiên làm việc">💾 <span class="session-label">Lưu</span></button>
-    <button class="btn-session" onclick="document.getElementById('load-session-input').click()" title="Tải phiên làm việc">📂 <span class="session-label">Load</span></button>
-    <button class="btn-session" onclick="openShareDialog()" title="Xuất / chia sẻ phiên làm việc" style="color:var(--accent2);border-color:rgba(16,185,129,.4);">🔗 <span class="session-label">Share</span></button>
-    <input type="file" id="load-session-input" accept=".json" style="display:none" onchange="loadSessionFile(event)"/>
-    <div class="sync-badge" id="sync-badge" onclick="openLoginBox()" title="Trạng thái đồng bộ cloud">☁️ <span id="sync-label">--</span></div>
-    <div class="session-dot" id="session-dot" title="Đã lưu tự động"></div>
+    
   </div>
 </div>
 
 <!-- Post list overlay -->
 <div id="post-list-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1200;align-items:center;justify-content:center;">
-  <div style="background:var(--surface);border-radius:var(--radius);padding:20px;min-width:300px;max-width:420px;width:90%;max-height:80vh;display:flex;flex-direction:column;gap:12px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;">
-      <div style="font-size:14px;font-weight:700;color:var(--text);">📋 Danh sách tin đã làm</div>
+  <div style="background:var(--surface);border-radius:var(--radius);padding:16px;min-width:300px;max-width:460px;width:92%;max-height:86vh;display:flex;flex-direction:column;gap:10px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+      <div style="font-size:14px;font-weight:700;color:var(--text);">📋 Danh sách tin đã làm <span id="post-list-count" style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:4px;"></span></div>
       <button onclick="closePostList()" style="background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;">✕</button>
     </div>
-    <div id="post-list-body" style="overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:6px;">
+    <div class="postlist-tools" style="display:flex;flex-wrap:wrap;align-items:center;gap:6px;">
+      <button class="btn-session" onclick="saveSession()" title="Lưu phiên làm việc">💾 <span class="session-label">Lưu</span></button>
+      <button class="btn-session" onclick="document.getElementById('load-session-input').click()" title="Tải phiên làm việc">📂 <span class="session-label">Load</span></button>
+      <button class="btn-session" onclick="openShareDialog()" title="Xuất / chia sẻ phiên làm việc" style="color:var(--accent2);border-color:rgba(16,185,129,.4);">🔗 <span class="session-label">Share</span></button>
+      <input type="file" id="load-session-input" accept=".json" style="display:none" onchange="loadSessionFile(event)"/>
+      <div class="sync-badge" id="sync-badge" onclick="openLoginBox()" title="Trạng thái đồng bộ cloud">☁️ <span id="sync-label">--</span></div>
+      <div class="session-dot" id="session-dot" title="Đã lưu tự động"></div>
+      <button class="btn-session" onclick="resetPost()" title="Xóa sạch dữ liệu các khối của tin đang làm" style="margin-left:auto;color:var(--red);border-color:rgba(239,68,68,.4);">⚠ Reset tin</button>
+    </div>
+    <input id="post-search" class="form-input" type="text" placeholder="🔍 Tìm mã tin, tiêu đề, địa chỉ..." oninput="renderPostList()" style="font-size:14px;padding:9px 10px;"/>
+    <div id="post-list-msg" style="display:none;font-size:12px;"></div>
+    <div id="post-list-body" style="overflow-y:auto;flex:1;min-height:80px;display:flex;flex-direction:column;gap:6px;">
       <div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>
     </div>
     <button onclick="loadNewPost()" style="background:var(--accent);color:#fff;border:none;border-radius:var(--radius-sm);padding:10px;font-size:13px;cursor:pointer;font-weight:600;">+ Tạo tin mới</button>
   </div>
 </div>
 
+<!-- Popup xác nhận chung -->
+<div id="kconfirm-overlay" onclick="if(event.target===this)kConfirmClose(false)" style="display:none;position:fixed;inset:0;background:rgba(10,11,16,.8);z-index:1500;align-items:center;justify-content:center;padding:16px;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:16px;box-shadow:0 12px 40px rgba(0,0,0,.6);">
+    <div id="kconfirm-msg" style="font-size:15px;font-weight:700;color:var(--text);word-break:break-word;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="merge-cancel" onclick="kConfirmClose(false)">Hủy</button>
+      <button id="kconfirm-ok" onclick="kConfirmClose(true)" style="background:var(--red);color:#fff;border:none;border-radius:var(--radius-sm);padding:10px 18px;font-size:13px;font-weight:700;cursor:pointer;">OK</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MOBILE BOTTOM NAV ── -->
 <nav class="mobile-nav" id="mobile-nav">
   <div class="mobile-nav-inner" id="mobile-nav-inner">
-    <div class="mobile-nav-item" data-block="import" onclick="switchBlock('import')">
-      <span class="mobile-nav-icon">🪄</span>
-      <span>Nhập</span>
-      <span class="mobile-nav-dot" id="mdot-import"></span>
-    </div>
     <div class="mobile-nav-item" data-block="video" onclick="switchBlock('video')">
       <span class="mobile-nav-icon">🎬</span>
       <span>Video</span>
@@ -609,10 +637,6 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-label">Các khối</div>
-    <div class="block-item" data-block="import" onclick="switchBlock('import')">
-      <span class="block-icon">🪄</span>Nhập nhanh
-      <span class="block-badge done" id="badge-import" style="display:none">✓</span>
-    </div>
     <div class="block-item" data-block="video" onclick="switchBlock('video')">
       <span class="block-icon">🎬</span>Video
       <span class="block-badge done" id="badge-video" style="display:none">✓</span>
@@ -672,43 +696,6 @@
   <!-- Main -->
   <div class="main">
     <div class="form-area">
-
-      <!-- ── BLOCK: NHẬP NHANH ── -->
-      <div id="block-import" style="display:none">
-        <div class="block-header">
-          <div class="block-icon-big">🪄</div>
-          <div class="block-header-text">
-            <h2>Nhập nhanh từ nguồn</h2>
-            <p>Dán mã nguồn trang tin từ Alonhadat, Chợ Tốt, Nhà Tốt, Batdongsan.com.vn, kenyo.vn hoặc 678.vn — tool tự tách và điền vào các khối bên dưới. Thiếu chỗ nào thì vào khối đó chỉnh tay sau.</p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Nguồn tin</label>
-          <select class="form-input" id="import-site">
-            <option value="alonhadat">Alonhadat.com.vn</option>
-            <option value="chotot">Chợ Tốt (chotot.com)</option>
-            <option value="nhatot">Nhà Tốt (nhatot.com)</option>
-            <option value="batdongsan">Batdongsan.com.vn</option>
-            <option value="kenyo">Kenyo.vn</option>
-            <option value="678">678.vn</option>
-            <option value="khac">Nguồn khác</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="form-label">Mã nguồn trang <span class="form-label-sub">chuột phải trên trang tin → "Xem nguồn trang" (View Page Source) → Ctrl+A, Ctrl+C → dán vào đây</span></label>
-          <textarea class="form-input" id="import-source" style="min-height:160px;font-family:var(--mono);font-size:11px;" placeholder="Dán toàn bộ HTML nguồn của trang tin đăng vào đây..."></textarea>
-        </div>
-        <button class="btn-gen" onclick="smartImport()" style="margin-bottom:16px">🪄 Phân tích & điền vào các khối</button>
-        <div class="form-group">
-          <div class="preview-label">Kết quả nhận diện</div>
-          <div class="merge-list" id="import-summary">
-            <div class="merge-empty">← Dán mã nguồn rồi bấm "Phân tích" để xem</div>
-          </div>
-        </div>
-        <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          ⚡ Tool chỉ đọc mã nguồn dán tay, không tự tải trang (trình duyệt chặn tải chéo domain). Kết quả là điền tự động best-effort — luôn kiểm tra lại từng khối trước khi bấm "Tạo code".
-        </div>
-      </div>
 
       <!-- ── BLOCK: VIDEO ── -->
       <div id="block-video" style="display:none">
@@ -1477,7 +1464,7 @@
   <div class="merge-box">
     <h3>📦 Chọn khối để gộp</h3>
     <div class="merge-subtext">Chỉ những khối đã bấm "Tạo code" mới hiện ở đây. Bỏ tick khối nào thì khối đó không có trong code gộp.</div>
-    <div class="merge-toprow"><button class="merge-selectall" onclick="toggleAllMergeChecks()">Chọn tất cả / Bỏ chọn tất cả</button></div>
+    <div class="merge-toprow" style="justify-content:space-between;align-items:center;gap:8px;"><span id="merge-stat" style="font-size:12px;font-weight:700;color:var(--tag-wl);"></span><button class="merge-selectall" onclick="toggleAllMergeChecks()">Chọn tất cả / Bỏ chọn tất cả</button></div>
     <div class="merge-list" id="merge-list"></div>
     <div class="merge-actions">
       <button class="merge-cancel" onclick="closeMergeDialog()">Hủy</button>
@@ -1581,6 +1568,7 @@ function _cloudBlockSave(block,code,ts,formData){
         }else{
           _editCount++;
           _updatePostIdDisplay();
+          _refreshPostListIfOpen();
         }
       });
     }).catch(function(){
@@ -1597,7 +1585,6 @@ function _cloudBlockSave(block,code,ts,formData){
 // nguyên hành vi cũ — trước đây cũng không được điền lại).
 function _fillFormsFromBlockCodes(){
   ALL_BLOCKS.forEach(function(b){
-    if(b==='import')return;
     if(!blockCodes[b])return;
     if(blockFormData[b]){
       _applyFormData(b,blockFormData[b]);
@@ -1729,51 +1716,146 @@ async function _cloudLoadPost(postId){
 }
 
 // ── CLOUD: post-list ────────────────────────────────────
+var _postsCache=[];
+function _vnNorm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');}
+function _postTA(p){
+  var t='',a='';
+  try{t=(JSON.parse(p.title_form_data||'{}').val||'');}catch(e){}
+  try{a=(JSON.parse(p.address_form_data||'{}').val||'');}catch(e){}
+  return {t:t,a:a};
+}
+var _plMsgT=null;
+function _postListMsg(txt,err){
+  var el=document.getElementById('post-list-msg');
+  if(!el)return;
+  el.style.display='block';
+  el.style.color=err?'var(--red)':'var(--accent2)';
+  el.textContent=txt;
+  if(_plMsgT)clearTimeout(_plMsgT);
+  _plMsgT=setTimeout(function(){el.style.display='none';},5000);
+}
 async function openPostList(){
-  if(!_cloudUser){
-    alert('Cần đăng nhập cloud để xem danh sách tin');
-    openLoginBox();return;
-  }
   document.getElementById('post-list-overlay').style.display='flex';
+  await _loadPostListData();
+}
+function _refreshPostListIfOpen(){
+  var o=document.getElementById('post-list-overlay');
+  if(o&&o.style.display==='flex')_loadPostListData();
+}
+async function _loadPostListData(){
   var body=document.getElementById('post-list-body');
-  body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>';
+  var cnt=document.getElementById('post-list-count');
+  if(!_cloudUser){
+    _postsCache=[];
+    body.onclick=null;
+    if(cnt)cnt.textContent='';
+    body.innerHTML='<button onclick="openLoginBox()" style="background:var(--surface2);color:var(--text);border:1px dashed var(--border);border-radius:var(--radius-sm);padding:12px;font-size:13px;cursor:pointer;">☁️ Đăng nhập cloud để xem danh sách tin</button>';
+    return;
+  }
+  if(!_postsCache.length)body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>';
   try{
     var resp=await fetch(CLOUD_WORKER_URL,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        action:'post-list',
-        phone:_cloudUser.phone||'',
-        email:_cloudUser.email||'',
-        secret:_cloudUser.secret||''
-      })
+      body:JSON.stringify({action:'post-list',phone:_cloudUser.phone||'',email:_cloudUser.email||'',secret:_cloudUser.secret||''})
     });
+    if(resp.status===401){body.innerHTML='<div style="color:var(--red);font-size:12px;">Sai mã nội bộ</div>';return;}
     var json=await resp.json();
-    var posts=json.posts||[];
-    if(!posts.length){
-      body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">Chưa có tin nào</div>';
-      return;
-    }
-    body.innerHTML=posts.map(function(p){
-      var active=p.post_id===_currentPostId?' style="border-color:var(--accent);background:rgba(99,102,241,.08);"':'';
-      var ago=_timeAgo(p.last_updated||0);
-      var snippet=_postListSnippet(p);
-      var snippetHtml=snippet?'<span style="font-size:12px;color:var(--text);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_esc(snippet)+'</span>':'';
-      return '<div data-postid="'+p.post_id+'" style="padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;display:flex;flex-direction:column;gap:3px;'+active+'">'+
-        '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+p.post_id+'</span>'+
-        snippetHtml+
-        '<span style="font-size:11px;color:var(--text-muted);">'+p.block_count+' khối đã lưu · '+ago+'</span>'+
-      '</div>';
-    }).join('');
-    // Gắn click sau khi render — tránh lỗi escape trong inline onclick
-    body.querySelectorAll('[data-postid]').forEach(function(el){
-      el.addEventListener('click',function(){ selectPost(el.getAttribute('data-postid')); });
-    });
+    _postsCache=(json.posts||[]).slice().sort(function(x,y){return (y.last_updated||0)-(x.last_updated||0);});
+    renderPostList();
   }catch(e){
     body.innerHTML='<div style="color:var(--red);font-size:12px;">Lỗi kết nối</div>';
   }
 }
-
+function renderPostList(){
+  var body=document.getElementById('post-list-body');
+  var cnt=document.getElementById('post-list-count');
+  var q=_vnNorm((document.getElementById('post-search')||{value:''}).value.trim());
+  var total=_postsCache.length;
+  var html=[];
+  _postsCache.forEach(function(p,i){
+    var ta=_postTA(p);
+    if(q&&_vnNorm(p.post_id+' '+ta.t+' '+ta.a).indexOf(q)===-1)return;
+    var cur=p.post_id===_currentPostId;
+    var snip=_postListSnippet(p);
+    html.push(
+      '<div class="pl-item'+(cur?' cur':'')+'" data-postid="'+_esc(String(p.post_id))+'">'+
+        '<div class="pl-main" data-act="open"><span class="pl-num">'+(i+1)+'</span>'+
+          '<div style="min-width:0;display:flex;flex-direction:column;gap:3px;">'+
+            '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+_esc(String(p.post_id))+'</span>'+
+            (snip?'<span style="font-size:12px;color:var(--text);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_esc(snip)+'</span>':'')+
+            '<span style="font-size:11px;color:var(--text-muted);">'+(p.block_count||0)+' khối đã lưu · '+_timeAgo(p.last_updated||0)+'</span>'+
+          '</div></div>'+
+        '<div class="pl-acts"><button class="pl-btn" data-act="copy" title="Nhân bản tin">📄</button><button class="pl-btn del" data-act="del" title="Xóa tin">🗑</button></div>'+
+      '</div>');
+  });
+  if(cnt)cnt.textContent=q?(html.length+'/'+total+' tin'):(total+' tin');
+  if(!html.length){
+    body.innerHTML='<div style="color:var(--text-dim);font-size:12px;">'+(total?'Không tìm thấy tin phù hợp':'Chưa có tin nào')+'</div>';
+    body.onclick=null;
+    return;
+  }
+  body.innerHTML=html.join('');
+  body.onclick=function(e){
+    var a=e.target.closest('[data-act]');if(!a)return;
+    var it=a.closest('.pl-item');if(!it)return;
+    var id=it.getAttribute('data-postid');
+    var act=a.getAttribute('data-act');
+    if(act==='open')selectPost(id);
+    else if(act==='copy')copyPost(id);
+    else if(act==='del')deletePost(id);
+  };
+}
+async function copyPost(id){
+  if(!_cloudUser)return;
+  _postListMsg('⏳ Đang nhân bản '+id+'...');
+  try{
+    var resp=await fetch(CLOUD_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action:'post-load',phone:_cloudUser.phone||'',email:_cloudUser.email||'',secret:_cloudUser.secret||'',post_id:id})});
+    var json=await resp.json();
+    var blocks=json.blocks||[];
+    if(!blocks.length){_postListMsg('Tin '+id+' chưa có khối nào để nhân bản',true);return;}
+    var newId=_genPostId(),g=0;
+    while(_postsCache.some(function(p){return p.post_id===newId;})&&g++<20)newId=_genPostId();
+    var now=Date.now();
+    var results=await Promise.all(blocks.map(function(row){
+      var fd=null;
+      if(row.form_data){try{fd=JSON.parse(row.form_data);}catch(e){}}
+      return fetch(CLOUD_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'block-save',phone:_cloudUser.phone||'',email:_cloudUser.email||'',secret:_cloudUser.secret||'',
+          post_id:newId,block:row.block,code:row.code,formData:fd,ts:now,device:window.innerWidth<=767?'mobile':'desktop'})
+      }).then(function(r){return r.json();}).catch(function(){return null;});
+    }));
+    var okc=results.filter(function(r){return r&&r.ok;}).length;
+    await _loadPostListData();
+    _postListMsg(okc?('✅ Đã nhân bản → '+newId+' ('+okc+'/'+blocks.length+' khối)'):'Nhân bản thất bại',!okc);
+  }catch(e){
+    _postListMsg('Lỗi kết nối khi nhân bản',true);
+  }
+}
+function deletePost(id){
+  kConfirm('Xóa tin '+id+'?','Xóa',async function(){
+    if(!_cloudUser)return;
+    try{
+      var resp=await fetch(CLOUD_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({action:'post-delete',phone:_cloudUser.phone||'',email:_cloudUser.email||'',secret:_cloudUser.secret||'',post_id:id})});
+      var json=await resp.json().catch(function(){return null;});
+      if(json&&json.ok){
+        _postsCache=_postsCache.filter(function(p){return p.post_id!==id;});
+        var newIdMsg='';
+        if(id===_currentPostId)newIdMsg=' · mã tin mới '+_afterDeleteCurrentPost();
+        renderPostList();
+        _postListMsg('🗑 Đã xóa '+id+newIdMsg);
+      }else{
+        var why=(json&&json.error)?json.error:('HTTP '+resp.status);
+        if(resp.status===401)why='Sai mã nội bộ';
+        _postListMsg('Không xóa được '+id+': '+why,true);
+      }
+    }catch(e){
+      _postListMsg('Lỗi kết nối khi xóa',true);
+    }
+  });
+}
 function closePostList(){
   document.getElementById('post-list-overlay').style.display='none';
 }
@@ -1965,6 +2047,7 @@ var CLOUD_SYNC_TS_KEY='kenyo_cloud_ts_v1';
 var _cloudUser=null; // {phone, email}
 var _lastCloudTs=0;
 var _cloudSyncTimer=null;
+var _skipUnloadPush=false; // true sau Reset tin: bỏ qua sendBeacon khi đóng tab, tự về false khi có chỉnh sửa tiếp
 
 function _loadCloudUser(){
   try{var r=localStorage.getItem(CLOUD_USER_KEY);return r?JSON.parse(r):null;}catch(e){return null;}
@@ -2086,6 +2169,7 @@ async function _cloudPull(){
 // Auto push sau _autoSave
 var _origAutoSaveCallback=null;
 function _autoSaveWithCloud(){
+  _skipUnloadPush=false;
   if(_sessionSaveTimer)clearTimeout(_sessionSaveTimer);
   _sessionSaveTimer=setTimeout(function(){
     try{
@@ -2118,7 +2202,7 @@ window.addEventListener('beforeunload',function(){
       ts:payload.ts,
       data:payload
     });
-    navigator.sendBeacon(CLOUD_WORKER_URL,new Blob([body],{type:'application/json'}));
+    if(!_skipUnloadPush)navigator.sendBeacon(CLOUD_WORKER_URL,new Blob([body],{type:'application/json'}));
     // Cũng lưu localStorage đồng bộ
     localStorage.setItem(SESSION_KEY,JSON.stringify(_buildSessionData()));
   }catch(e){}
@@ -2611,7 +2695,7 @@ function onHistoryBtnClick(){
 }
 
 var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
-var ALL_BLOCKS=['import','video','title','address','specs','finance','legaldoc','map','cta','aitools','clock','phaply','images','gopy'];
+var ALL_BLOCKS=['video','title','address','specs','finance','legaldoc','map','cta','aitools','clock','phaply','images','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=30,currentLegalMau=1;
 var activePlRows=0,MAX_PL=20,currentPlMau=1;
@@ -2664,7 +2748,7 @@ function switchBlock(name){
   var mobileItem=document.querySelector('.mobile-nav-item[data-block="'+name+'"]');
   if(mobileItem)mobileItem.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   currentBlock=name;
-  var hints={import:'Dán mã nguồn trang tin rồi bấm "Phân tích & điền vào các khối"',video:'Điền link video rồi bấm tạo code',title:'Nhập tiêu đề rồi bấm tạo code',address:'Nhập địa chỉ rồi bấm tạo code',specs:'Paste/nhập thông số rồi bấm tạo code',finance:'Chọn mẫu, điền giá rồi bấm tạo code',map:'Dán thẻ iframe bản đồ rồi bấm tạo code',cta:'Điền số điện thoại rồi bấm tạo code',images:'Điền link ảnh + caption rồi bấm tạo code',legaldoc:'Chọn mẫu, điền ảnh sổ rồi bấm tạo code',phaply:'Chọn mẫu, điền hồ sơ pháp lý rồi bấm tạo code',clock:'Bấm tạo code để chèn khối đồng hồ',aitools:'Bật các khối AI muốn dùng rồi bấm tạo code',gopy:'Bấm tạo code để chèn khối góp ý'};
+  var hints={video:'Điền link video rồi bấm tạo code',title:'Nhập tiêu đề rồi bấm tạo code',address:'Nhập địa chỉ rồi bấm tạo code',specs:'Paste/nhập thông số rồi bấm tạo code',finance:'Chọn mẫu, điền giá rồi bấm tạo code',map:'Dán thẻ iframe bản đồ rồi bấm tạo code',cta:'Điền số điện thoại rồi bấm tạo code',images:'Điền link ảnh + caption rồi bấm tạo code',legaldoc:'Chọn mẫu, điền ảnh sổ rồi bấm tạo code',phaply:'Chọn mẫu, điền hồ sơ pháp lý rồi bấm tạo code',clock:'Bấm tạo code để chèn khối đồng hồ',aitools:'Bật các khối AI muốn dùng rồi bấm tạo code',gopy:'Bấm tạo code để chèn khối góp ý'};
   _setHint(hints[name]||'Điền thông tin rồi bấm tạo code');
   updateHistoryBtn(name);
   document.getElementById('history-dropdown').classList.remove('open');
@@ -2789,29 +2873,6 @@ function _cartSeoLines(items){
   });
   l.push('</ul>');
   return l;
-}
-function extractCart(doc){
-  var out=[],seen={};
-  function add(n,l){
-    var u=_cartNorm(l);
-    if(!u||!_cartHostOk(u)||seen[u]||out.length>=CART_MAX)return;
-    seen[u]=1;out.push({n:(n||'').trim(),u:u});
-  }
-  var cfg=doc.getElementById('kenyo-yt-config');
-  if(cfg){
-    var blob=cfg.getAttribute('data-cart')||'';
-    if(blob)blob.split(';;').forEach(function(p){var b=p.lastIndexOf('|');if(b!==-1)add(p.slice(0,b),p.slice(b+1));else add('',p);});
-  }
-  doc.querySelectorAll('.kenyo-cart-seo a').forEach(function(a){
-    var t=(a.textContent||'').trim();
-    add(/^https?:\/\//i.test(t)?'':t,a.getAttribute('href')||'');
-  });
-  doc.querySelectorAll('.kenyo-cart-line').forEach(function(p){
-    var t=(p.textContent||'').trim();
-    var m=t.match(/^(?:(.*?)\s*:\s*)?(https?:\/\/\S+)$/);
-    if(m)add(m[1]||'',m[2]);
-  });
-  return out;
 }
 
 function addSlot(){
@@ -3717,7 +3778,7 @@ function openMergeDialog(){
       any=true;
       var label=document.createElement('label');
       label.className='merge-item';
-      label.innerHTML='<input type="checkbox" class="merge-check" data-block="'+b+'" checked/><span>'+(BLOCK_LABELS[b]||b)+'</span>';
+      label.innerHTML='<input type="checkbox" class="merge-check" data-block="'+b+'" checked onchange="updateMergeStat()"/><span class="merge-num">'+(ALL_BLOCKS.indexOf(b)+1)+'.</span><span>'+(BLOCK_LABELS[b]||b)+'</span>';
       listEl.appendChild(label);
     }
   });
@@ -3725,6 +3786,7 @@ function openMergeDialog(){
     listEl.innerHTML='<div class="merge-empty">Chưa có khối nào được tạo code. Hãy vào từng khối, bấm "Tạo code" trước đã.</div>';
   }
   document.getElementById('merge-overlay').style.display='flex';
+  updateMergeStat();
 }
 function closeMergeDialog(){
   document.getElementById('merge-overlay').style.display='none';
@@ -3734,6 +3796,7 @@ function toggleAllMergeChecks(){
   if(boxes.length===0)return;
   var allChecked=Array.prototype.every.call(boxes,function(c){return c.checked;});
   boxes.forEach(function(c){c.checked=!allChecked;});
+  updateMergeStat();
 }
 function confirmMergeDialog(){
   var boxes=document.querySelectorAll('.merge-check');
@@ -3870,7 +3933,7 @@ function copyCode(source){
     document.body.removeChild(ta);
   }
 }
-function resetBlock(){
+function _doResetBlock(){
   if(currentBlock==='video'){
     for(var i=1;i<=5;i++){
       var u=document.getElementById('url-'+i);if(u)u.value='';
@@ -3960,230 +4023,6 @@ function resetBlock(){
   updateCopyButtons();
   if(typeof syncSheetContent==='function')syncSheetContent();
   _setHint('Điền thông tin rồi bấm tạo code');
-}
-
-// ========== NHẬP NHANH TỪ NGUỒN ==========
-var SOURCE_SITE_SUFFIX={
-  alonhadat:[/\s*[-|]\s*Alonhadat[^$]*$/i,/\s*[-|]\s*alonhadat\.com\.vn[^$]*$/i],
-  chotot:[/\s*[-|]\s*Chợ Tốt[^$]*$/i,/\s*[-|]\s*Chotot[^$]*$/i],
-  nhatot:[/\s*[-|]\s*Nhà Tốt[^$]*$/i,/\s*[-|]\s*Nhatot[^$]*$/i],
-  batdongsan:[/\s*[-|]\s*Batdongsan[^$]*$/i,/\s*[-|]\s*mua bán nhà đất[^$]*$/i],
-  kenyo:[/\s*[-|]\s*Kenyo[^$]*$/i],
-  '678':[/\s*[-|]\s*678\.vn[^$]*$/i],
-  khac:[]
-};
-function stripSiteSuffix(title,site){
-  var pats=SOURCE_SITE_SUFFIX[site]||[];
-  var out=title;
-  pats.forEach(function(re){out=out.replace(re,'');});
-  return out.trim();
-}
-function getMetaContentAll(doc,prop){
-  var sel='meta[property="'+prop+'"], meta[name="'+prop+'"]';
-  var els=doc.querySelectorAll(sel);
-  var vals=[];
-  els.forEach(function(e){var c=e.getAttribute('content');if(c&&c.trim())vals.push(c.trim());});
-  return vals;
-}
-function extractPhones(text){
-  var re=/(0|\+84)(3|5|7|8|9)\d{8}\b/g;
-  var m,out=[],seen={};
-  while((m=re.exec(text))){
-    var num=m[0].replace(/^\+84/,'0');
-    if(!seen[num]){seen[num]=1;out.push(num);}
-  }
-  return out;
-}
-function extractPrice(text){
-  var re=/(giá\s*(bán)?\s*[:：]?\s*)?(\d+[.,]?\d*)\s*(tỷ|triệu)/i;
-  var m=text.match(re);
-  return m?(m[3]+' '+m[4]).trim():'';
-}
-function extractAddress(text){
-  var re=/(?:Địa chỉ|Vị trí)\s*[:：\-]?\s*([^\n<.]{8,150})/i;
-  var m=text.match(re);
-  if(m)return m[1].trim();
-  var lines=text.split('\n');
-  for(var i=0;i<lines.length;i++){
-    var l=lines[i].trim();
-    if(l.length>8&&l.length<160&&/(Phường|Quận|Huyện|Xã|Đường|Tỉnh|Thành phố)/i.test(l)){
-      return l;
-    }
-  }
-  return '';
-}
-function extractSpecs(text){
-  var labels=['Diện tích đất','Diện tích sử dụng','Diện tích sàn','Diện tích','Kích thước','Pháp lý','Hướng nhà','Hướng cửa','Hướng','Số tầng','Số phòng ngủ','Phòng ngủ','Số toilet','Phòng vệ sinh','Nội thất','Mặt tiền','Đường vào','Kết cấu'];
-  var pattern=new RegExp('('+labels.join('|')+')\\s*[:：]\\s*([^\\n<]{1,80})','gi');
-  var m,lines=[],seen={};
-  while((m=pattern.exec(text))){
-    var line=m[1].trim()+': '+m[2].trim();
-    if(!seen[line]){seen[line]=1;lines.push(line);}
-  }
-  return lines.join('\n');
-}
-function decodeHtmlEntities(str){
-  var txt=document.createElement('textarea');
-  txt.innerHTML=str;
-  return txt.value;
-}
-function getElText(el){
-  if(!el)return '';
-  var html=el.innerHTML||'';
-  html=html.replace(/<br\s*\/?>/gi,'\n').replace(/<\/p>/gi,'\n').replace(/<[^>]+>/g,'');
-  return decodeHtmlEntities(html).replace(/\r\n/g,'\n').replace(/\r/g,'\n').replace(/\n{3,}/g,'\n\n').trim();
-}
-function extractSpecsFromDoc(doc,site){
-  if(site==='alonhadat'){
-    var selectors=[
-      'article.property p[itemprop="description"]',
-      'article.property [itemprop="description"]',
-      'section.detail p[itemprop="description"]',
-      '.detail.text-content p[itemprop="description"]',
-      'p[itemprop="description"]'
-    ];
-    for(var i=0;i<selectors.length;i++){
-      var el=doc.querySelector(selectors[i]);
-      if(el){var t=getElText(el);if(t.length>30)return t;}
-    }
-  }
-  if(site==='chotot'||site==='nhatot'){
-    var el2=doc.querySelector('[class*="description"],[class*="content"],[itemprop="description"]');
-    if(el2){return getElText(el2);}
-  }
-  if(site==='batdongsan'){
-    var el3=doc.querySelector('.re__detail-content,[class*="detail-description"],[itemprop="description"]');
-    if(el3){return getElText(el3);}
-  }
-  return '';
-}
-function extractImages(doc,ogImages){
-  var out=[],seen={};
-  ogImages.forEach(function(src){if(src&&!seen[src]){seen[src]=1;out.push(src);}});
-  var imgs=doc.querySelectorAll('img');
-  imgs.forEach(function(img){
-    var src=img.getAttribute('src')||img.getAttribute('data-src')||img.getAttribute('data-original')||'';
-    if(!src)return;
-    var lower=src.toLowerCase();
-    if(/logo|icon|avatar|sprite|favicon|blank\.gif|pixel|ads[-_]?banner/.test(lower))return;
-    var w=parseInt(img.getAttribute('width')||'0',10);
-    var h=parseInt(img.getAttribute('height')||'0',10);
-    if(w&&w<80)return;
-    if(h&&h<80)return;
-    if(!seen[src]){seen[src]=1;out.push(src);}
-  });
-  return out.slice(0,30);
-}
-function extractVideos(doc,rawHtml){
-  var out=[];
-  doc.querySelectorAll('iframe').forEach(function(f){
-    var src=f.getAttribute('src')||'';
-    if(/youtu|tiktok/i.test(src))out.push(src);
-  });
-  var re=/(https?:\/\/(?:www\.)?(?:youtube\.com\/watch\?v=[\w-]+|youtu\.be\/[\w-]+|(?:www\.)?tiktok\.com\/[^\s"'<>]+))/gi;
-  var m;
-  while((m=re.exec(rawHtml))){if(out.indexOf(m[1])===-1)out.push(m[1]);}
-  var seen={};
-  return out.filter(function(u){if(seen[u])return false;seen[u]=1;return true;}).slice(0,5);
-}
-function extractMapSrc(doc){
-  var f=doc.querySelector('iframe[src*="google.com/maps"], iframe[src*="maps.google"]');
-  return f?f.getAttribute('src'):'';
-}
-function smartImport(){
-  var site=document.getElementById('import-site').value;
-  var raw=document.getElementById('import-source').value;
-  var summaryEl=document.getElementById('import-summary');
-  if(!raw.trim()){
-    summaryEl.innerHTML='<div class="merge-empty">⚠ Chưa dán mã nguồn trang.</div>';
-    return;
-  }
-  var doc;
-  try{doc=new DOMParser().parseFromString(raw,'text/html');}
-  catch(e){summaryEl.innerHTML='<div class="merge-empty">⚠ Không đọc được mã nguồn — kiểm tra lại nội dung dán vào.</div>';return;}
-
-  var bodyText=(doc.body?(doc.body.innerText||doc.body.textContent):'')||'';
-  var ogTitles=getMetaContentAll(doc,'og:title');
-  var rawTitle=ogTitles[0]||(doc.querySelector('title')?doc.querySelector('title').textContent:'')||'';
-  var title=stripSiteSuffix(rawTitle,site);
-  var ogDescs=getMetaContentAll(doc,'og:description');
-  var desc=ogDescs[0]||'';
-  var combinedText=title+'\n'+desc+'\n'+bodyText;
-
-  var address='';
-  if(site==='alonhadat'){
-    var addrEl=doc.querySelector('article.property p.old-address');
-    if(addrEl){address=getElText(addrEl).replace(/\(địa chỉ cũ\)/i,'').replace(/\(cũ\)/i,'').trim();}
-    if(!address){
-      var addrEl2=doc.querySelector('article.property address.current-address');
-      if(addrEl2){address=getElText(addrEl2).trim();}
-    }
-  }
-  if(!address)address=extractAddress(combinedText);
-
-  var price=extractPrice(combinedText);
-  var specs=extractSpecsFromDoc(doc,site);
-  if(!specs)specs=extractSpecs(bodyText);
-
-  var ogImages=getMetaContentAll(doc,'og:image');
-  var images=extractImages(doc,ogImages);
-  var videos=extractVideos(doc,raw);
-  var cartIn=extractCart(doc);
-  var phones=extractPhones(combinedText);
-  var mapSrc=extractMapSrc(doc);
-
-  if(title){document.getElementById('input-title').value=title;updateTitlePreview();}
-  if(address){document.getElementById('input-address').value=address;updateAddressPreview();}
-  if(specs){document.getElementById('input-specs').value=specs;}
-  if(price){
-    document.getElementById('f-price').value=price;
-    document.getElementById('f-preview').value=price;
-    updateFinancePreview();
-  }
-  if(images.length){
-    document.getElementById('img-rows').innerHTML='';
-    activeImgSlots=0;
-    images.forEach(function(src){
-      addImgRow();
-      document.getElementById('img-link-'+activeImgSlots).value=src;
-    });
-  }
-  if(videos.length){
-    document.getElementById('url-1').value=videos[0];
-    detectType(1);
-    for(var vi=1;vi<videos.length&&vi<5;vi++){
-      if(activeSlots<=vi)addSlot();
-      document.getElementById('url-'+(vi+1)).value=videos[vi];
-      detectType(vi+1);
-    }
-  }
-  if(cartIn.length){
-    clearCartRows();
-    cartIn.forEach(function(c){addCartRow(c.n,c.u);});
-  }
-  if(phones.length){
-    document.getElementById('cta-phone-1').value=phones[0];
-    for(var phi=1;phi<phones.length&&phi<5;phi++){
-      if(activeCta<=phi)addCta();
-      document.getElementById('cta-phone-'+(phi+1)).value=phones[phi];
-    }
-  }
-  if(mapSrc){
-    document.getElementById('input-map').value='<iframe src="'+mapSrc+'"></iframe>';
-    updateMapPreview();
-  }
-
-  var rows=[
-    ['Tiêu đề',!!title],['Địa chỉ',!!address],['Giá',!!price],['Thông số',!!specs],
-    ['Ảnh ('+images.length+')',images.length>0],['Video ('+videos.length+')',videos.length>0],['Giỏ hàng ('+cartIn.length+')',cartIn.length>0],
-    ['Điện thoại',phones.length>0],['Bản đồ',!!mapSrc]
-  ];
-  summaryEl.innerHTML=rows.map(function(r){
-    return '<div class="merge-item" style="cursor:default">'+
-      (r[1]?'<span style="color:var(--accent2)">✓</span>':'<span style="color:var(--tag-yt)">✗</span>')+
-      '<span>'+r[0]+(r[1]?'':' — không tìm thấy, vào khối tương ứng điền tay')+'</span></div>';
-  }).join('');
-  _setHint('🪄 Đã điền tự động — vào từng khối kiểm tra lại trước khi Tạo code');
 }
 
 // ========== MOBILE OUTPUT SHEET ==========
@@ -4379,6 +4218,84 @@ document.getElementById('video-slots').addEventListener('paste', function(e) {
 });
 // ====================================================
 
+// ── PATCH: popup xác nhận, reset, đánh số ──
+function _cancelPendingSync(){
+  if(_sessionSaveTimer){clearTimeout(_sessionSaveTimer);_sessionSaveTimer=null;}
+  if(_cloudSyncTimer){clearTimeout(_cloudSyncTimer);_cloudSyncTimer=null;}
+}
+function _saveLocalOnly(){
+  try{localStorage.setItem(SESSION_KEY,JSON.stringify(_buildSessionData()));}catch(e){}
+}
+// Xóa đúng tin đang mở: dọn sạch form + sang mã tin mới, đồng bộ phiên cloud
+function _afterDeleteCurrentPost(){
+  var keep=currentBlock;
+  ALL_BLOCKS.forEach(function(b){currentBlock=b;try{_doResetBlock();}catch(e){}});
+  currentBlock=keep;
+  blockCodes={};blockTs={};blockFormData={};
+  generatedCode='';
+  var newId=_genPostId(),g=0;
+  while(_postsCache.some(function(p){return p.post_id===newId;})&&g++<20)newId=_genPostId();
+  _savePostId(newId);
+  _editCount=0;_updatePostIdDisplay();
+  updateHistoryBtn(currentBlock);
+  _autoSave();
+  return newId;
+}
+var _kcCb=null;
+function kConfirm(msg,okLabel,cb){
+  _kcCb=cb;
+  document.getElementById('kconfirm-msg').textContent=msg;
+  document.getElementById('kconfirm-ok').textContent=okLabel||'OK';
+  document.getElementById('kconfirm-overlay').style.display='flex';
+}
+function kConfirmClose(run){
+  document.getElementById('kconfirm-overlay').style.display='none';
+  var cb=_kcCb;_kcCb=null;
+  if(run&&cb)cb();
+}
+function resetBlock(){
+  var lbl=BLOCK_LABELS[currentBlock]||currentBlock;
+  kConfirm('Reset tab '+lbl+'?','Reset tab',function(){_doResetBlock();});
+}
+function resetPost(){
+  kConfirm('Reset tin '+(_currentPostId||'')+'?','Reset tin',function(){
+    var oldId=_currentPostId||'';
+    var keep=currentBlock;
+    ALL_BLOCKS.forEach(function(b){currentBlock=b;try{_doResetBlock();}catch(e){}});
+    currentBlock=keep;
+    blockCodes={};blockTs={};blockFormData={};
+    generatedCode='';
+    var newId=_genPostId(),g=0;
+    while((newId===oldId||_postsCache.some(function(p){return p.post_id===newId;}))&&g++<20)newId=_genPostId();
+    _savePostId(newId);
+    _editCount=0;_updatePostIdDisplay();
+    updateHistoryBtn(currentBlock);
+    _cancelPendingSync();
+    _skipUnloadPush=true;
+    _saveLocalOnly();
+    closePostList();
+    _setHint('♻️ Đã reset — mã tin mới '+newId+(oldId?(' (tin '+oldId+' vẫn còn trong danh sách)'):''),4);
+  });
+}
+function updateMergeStat(){
+  var boxes=document.querySelectorAll('.merge-check');
+  var n=0;
+  boxes.forEach(function(c){if(c.checked)n++;});
+  var el=document.getElementById('merge-stat');
+  if(el)el.textContent=boxes.length?('Đã chọn '+n+' / '+boxes.length+' khối'):'';
+}
+function numberTabs(){
+  document.querySelectorAll('.mobile-nav-item').forEach(function(it,i){
+    var lbl=it.children[1];
+    if(lbl&&!lbl.querySelector('.tab-num'))lbl.insertAdjacentHTML('afterbegin','<b class="tab-num">'+(i+1)+'.</b>');
+  });
+  document.querySelectorAll('.sidebar .block-item').forEach(function(it,i){
+    var ic=it.querySelector('.block-icon');
+    if(ic&&!it.querySelector('.tab-num'))ic.insertAdjacentHTML('afterend','<span class="tab-num">'+(i+1)+'.</span>');
+  });
+}
+numberTabs();
+
 // Init
 selectMau(1);
 addImgRow();
@@ -4402,13 +4319,13 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('V52',size/2,size*0.82);
+    ctx.fillText('V56',size/2,size*0.82);
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i V52',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i V56',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:'https://dangtin.678.vn/',
