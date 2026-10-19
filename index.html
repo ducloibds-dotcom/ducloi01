@@ -455,6 +455,9 @@
   .pl-main{flex:1;min-width:0;display:flex;gap:10px;padding:9px 10px;cursor:pointer;align-items:flex-start;}
   .pl-main:hover{background:var(--surface2);}
   .pl-num{min-width:26px;height:22px;padding:0 5px;border-radius:5px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .pl-note{font-size:12px;color:#fbbf24;line-height:1.35;word-break:break-word;padding:2px 0;cursor:text;}
+  .pl-note.empty{color:var(--text-dim);font-size:11px;opacity:.75;}
+  .pl-note-in{width:100%;box-sizing:border-box;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--accent);background:var(--surface2);color:var(--text);outline:none;}
   .pl-acts{display:flex;flex-shrink:0;border-left:1px solid var(--border);}
   .pl-btn{background:transparent;border:none;padding:0 12px;cursor:pointer;font-size:14px;color:var(--text-dim);transition:color .12s,background .12s;}
   .pl-btn:hover,.pl-btn:active{color:var(--text);background:var(--surface2);}
@@ -465,7 +468,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V56</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V58</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -499,7 +502,7 @@
       <div class="session-dot" id="session-dot" title="Đã lưu tự động"></div>
       <button class="btn-session" onclick="resetPost()" title="Xóa sạch dữ liệu các khối của tin đang làm" style="margin-left:auto;color:var(--red);border-color:rgba(239,68,68,.4);">⚠ Reset tin</button>
     </div>
-    <input id="post-search" class="form-input" type="text" placeholder="🔍 Tìm mã tin, tiêu đề, địa chỉ..." oninput="renderPostList()" style="font-size:14px;padding:9px 10px;"/>
+    <input id="post-search" class="form-input" type="text" placeholder="🔍 Tìm mã tin, tiêu đề, địa chỉ, ghi chú..." oninput="renderPostList()" style="font-size:14px;padding:9px 10px;"/>
     <div id="post-list-msg" style="display:none;font-size:12px;"></div>
     <div id="post-list-body" style="overflow-y:auto;flex:1;min-height:80px;display:flex;flex-direction:column;gap:6px;">
       <div style="color:var(--text-dim);font-size:12px;">Đang tải...</div>
@@ -1682,6 +1685,7 @@ async function _cloudLoadPost(postId){
     // Merge theo ts — cloud thắng nếu mới hơn
     var updated=0;
     blocks.forEach(function(row){
+      if(row.block==='_note')return; // ghi chú tin, không phải khối nội dung
       var localTs=blockTs[row.block]||0;
       if(row.ts>localTs){
         blockCodes[row.block]=row.code;
@@ -1717,6 +1721,59 @@ async function _cloudLoadPost(postId){
 
 // ── CLOUD: post-list ────────────────────────────────────
 var _postsCache=[];
+// Ghi chú tay cho từng tin — lưu cloud dưới dạng khối đặc biệt '_note' (block-save có sẵn)
+var POST_NOTES_KEY='kenyo_post_notes'; // chỉ còn dùng để chuyển ghi chú cũ (V57, lưu máy) lên cloud
+function _noteOf(p){
+  try{return (JSON.parse(p.note_form_data||'{}').val||'');}catch(e){return '';}
+}
+function _getPostNote(id){
+  var p=_postsCache.find(function(x){return x.post_id===id;});
+  return p?_noteOf(p):'';
+}
+function _setPostNote(id,val){
+  val=String(val||'').trim().slice(0,200);
+  var p=_postsCache.find(function(x){return x.post_id===id;});
+  if(p)p.note_form_data=JSON.stringify({val:val});
+  if(!_cloudUser)return;
+  fetch(CLOUD_WORKER_URL,{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({action:'block-save',phone:_cloudUser.phone||'',email:_cloudUser.email||'',secret:_cloudUser.secret||'',
+      post_id:id,block:'_note',code:'',formData:{val:val},ts:Date.now(),device:window.innerWidth<=767?'mobile':'desktop'})
+  }).then(function(r){return r.json();}).then(function(j){
+    if(!j||!j.ok)_postListMsg('Không lưu được ghi chú'+((j&&j.error)?': '+j.error:''),true);
+  }).catch(function(){_postListMsg('Lỗi kết nối — ghi chú chưa lưu cloud',true);});
+}
+// Chuyển ghi chú cũ lưu trên máy (V57) lên cloud một lần
+function _migrateLocalNotes(){
+  var raw=null;
+  try{raw=localStorage.getItem(POST_NOTES_KEY);}catch(e){}
+  if(!raw)return;
+  var loc={};
+  try{loc=JSON.parse(raw)||{};}catch(e){}
+  Object.keys(loc).forEach(function(id){
+    var p=_postsCache.find(function(x){return x.post_id===id;});
+    if(p&&!_noteOf(p)&&loc[id])_setPostNote(id,loc[id]);
+  });
+  try{localStorage.removeItem(POST_NOTES_KEY);}catch(e){}
+}
+function _editPostNote(el,id){
+  var inp=document.createElement('input');
+  inp.type='text';inp.className='pl-note-in';inp.maxLength=200;
+  inp.placeholder='Ghi chú...';inp.value=_getPostNote(id);
+  var done=false;
+  function finish(save){
+    if(done)return;done=true;
+    if(save)_setPostNote(id,inp.value);
+    inp.onblur=null;inp.blur(); // bỏ focus để renderPostList không bị chặn
+    renderPostList();
+  }
+  inp.onblur=function(){finish(true);};
+  inp.onkeydown=function(e){
+    if(e.key==='Enter'){e.preventDefault();finish(true);}
+    else if(e.key==='Escape'){e.preventDefault();finish(false);}
+  };
+  el.replaceWith(inp);
+  inp.focus();
+}
 function _vnNorm(t){return String(t||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/đ/g,'d');}
 function _postTA(p){
   var t='',a='';
@@ -1762,6 +1819,7 @@ async function _loadPostListData(){
     if(resp.status===401){body.innerHTML='<div style="color:var(--red);font-size:12px;">Sai mã nội bộ</div>';return;}
     var json=await resp.json();
     _postsCache=(json.posts||[]).slice().sort(function(x,y){return (y.last_updated||0)-(x.last_updated||0);});
+    _migrateLocalNotes();
     renderPostList();
   }catch(e){
     body.innerHTML='<div style="color:var(--red);font-size:12px;">Lỗi kết nối</div>';
@@ -1771,11 +1829,15 @@ function renderPostList(){
   var body=document.getElementById('post-list-body');
   var cnt=document.getElementById('post-list-count');
   var q=_vnNorm((document.getElementById('post-search')||{value:''}).value.trim());
+  // đang gõ ghi chú thì không vẽ lại (tránh mất chữ khi cloud vừa đồng bộ xong)
+  var ae=document.activeElement;
+  if(ae&&ae.classList&&ae.classList.contains('pl-note-in'))return;
   var total=_postsCache.length;
   var html=[];
   _postsCache.forEach(function(p,i){
     var ta=_postTA(p);
-    if(q&&_vnNorm(p.post_id+' '+ta.t+' '+ta.a).indexOf(q)===-1)return;
+    var note=_noteOf(p);
+    if(q&&_vnNorm(p.post_id+' '+ta.t+' '+ta.a+' '+note).indexOf(q)===-1)return;
     var cur=p.post_id===_currentPostId;
     var snip=_postListSnippet(p);
     html.push(
@@ -1785,6 +1847,7 @@ function renderPostList(){
             '<span style="font-size:13px;font-family:var(--mono);color:var(--text);font-weight:600;">'+_esc(String(p.post_id))+'</span>'+
             (snip?'<span style="font-size:12px;color:var(--text);opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+_esc(snip)+'</span>':'')+
             '<span style="font-size:11px;color:var(--text-muted);">'+(p.block_count||0)+' khối đã lưu · '+_timeAgo(p.last_updated||0)+'</span>'+
+            '<div class="pl-note'+(note?'':' empty')+'" data-act="note">'+(note?('📝 '+_esc(note)):'✏️ Thêm ghi chú')+'</div>'+
           '</div></div>'+
         '<div class="pl-acts"><button class="pl-btn" data-act="copy" title="Nhân bản tin">📄</button><button class="pl-btn del" data-act="del" title="Xóa tin">🗑</button></div>'+
       '</div>');
@@ -1797,11 +1860,13 @@ function renderPostList(){
   }
   body.innerHTML=html.join('');
   body.onclick=function(e){
+    if(e.target.tagName==='INPUT')return;
     var a=e.target.closest('[data-act]');if(!a)return;
     var it=a.closest('.pl-item');if(!it)return;
     var id=it.getAttribute('data-postid');
     var act=a.getAttribute('data-act');
-    if(act==='open')selectPost(id);
+    if(act==='note')_editPostNote(a,id);
+    else if(act==='open')selectPost(id);
     else if(act==='copy')copyPost(id);
     else if(act==='del')deletePost(id);
   };
@@ -4319,13 +4384,13 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('V56',size/2,size*0.82);
+    ctx.fillText('V58',size/2,size*0.82);
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i V56',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i V58',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:'https://dangtin.678.vn/',
