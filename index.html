@@ -2855,6 +2855,10 @@ var CART_MAX=30,cartRowN=0,cartSeoActive=true;
 var CART_HOSTS=['kenyo.vn','678.vn','alonhadat.com.vn','batdongsan.com.vn','chotot.com','nha.chotot.com','shopee.vn','shp.ee'];
 function _cartEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _cartNorm(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u.replace(/^\/+/,'');return u;}
+/* Khóa so trùng, khớp cartKey của trang cuối (cách tính của file gốc): đường dẫn + ?query. Khác đuôi ?ref=1 là 2 sản phẩm; chỉ khác #… hoặc tên miền thì vẫn là 1 */
+function _cartKey(u){
+  try{var x=new URL(u);return x.pathname+x.search;}catch(e){return u;}
+}
 function _cartHost(u){try{return new URL(u).hostname.toLowerCase().replace(/^www\./,'');}catch(e){return '';}}
 function _cartHostOk(u){return CART_HOSTS.indexOf(_cartHost(u))!==-1;}
 function _cartRows(){
@@ -2872,8 +2876,8 @@ function _cartItems(){
   var r=_cartRows(),out=[],seen={};
   for(var i=0;i<r.length;i++){
     var u=_cartNorm(r[i].l);
-    if(!u||!_cartHostOk(u)||seen[u])continue;
-    seen[u]=1;out.push({n:r[i].n,u:u});
+    if(!u||!_cartHostOk(u)||seen[_cartKey(u)])continue;
+    seen[_cartKey(u)]=1;out.push({n:r[i].n,u:u});
     if(out.length>=CART_MAX)break;
   }
   return out;
@@ -2888,8 +2892,8 @@ function updateCartCount(){
     var u=_cartNorm(rows[i].l);
     if(!u){if(rows[i].n)noLink++;continue;}
     if(!_cartHostOk(u)){bad++;continue;}
-    if(seen[u]){dup++;continue;}
-    seen[u]=1;valid++;
+    if(seen[_cartKey(u)]){dup++;continue;}
+    seen[_cartKey(u)]=1;valid++;
     if(!rows[i].n)noName++;
   }
   document.getElementById('cart-count').textContent='('+valid+'/'+CART_MAX+')';
