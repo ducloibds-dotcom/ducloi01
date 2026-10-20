@@ -468,7 +468,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V58</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V59</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -706,7 +706,7 @@
           <div class="block-icon-big">🎬</div>
           <div class="block-header-text">
             <h2>Khối Video</h2>
-            <p>1–5 video. Hỗ trợ YouTube, Shorts và TikTok.</p>
+            <p>1–7 video. Hỗ trợ YouTube, Shorts và TikTok.</p>
           </div>
         </div>
         <div class="form-group">
@@ -779,9 +779,35 @@
                 </div>
               </div>
             </div>
+            <div class="video-slot" id="slot-6" style="display:none">
+              <div class="video-slot-num">6</div>
+              <div class="video-slot-main">
+                <div class="video-slot-row">
+                  <input class="video-slot-url" id="url-6" type="text" placeholder="Link YouTube hoặc TikTok" oninput="detectType(6)"/>
+                  <span class="video-type-badge vtype-empty" id="type-6">—</span>
+                </div>
+                <div class="video-slot-row">
+                  <input class="video-slot-label" id="label-6" type="text" placeholder="Nhãn nút (tuỳ chọn)"/>
+                  <span class="slot-optional">bỏ trống = "Video 6"</span>
+                </div>
+              </div>
+            </div>
+            <div class="video-slot" id="slot-7" style="display:none">
+              <div class="video-slot-num">7</div>
+              <div class="video-slot-main">
+                <div class="video-slot-row">
+                  <input class="video-slot-url" id="url-7" type="text" placeholder="Link YouTube hoặc TikTok" oninput="detectType(7)"/>
+                  <span class="video-type-badge vtype-empty" id="type-7">—</span>
+                </div>
+                <div class="video-slot-row">
+                  <input class="video-slot-label" id="label-7" type="text" placeholder="Nhãn nút (tuỳ chọn)"/>
+                  <span class="slot-optional">bỏ trống = "Video 7"</span>
+                </div>
+              </div>
+            </div>
           </div>
           <button class="add-slot-btn" id="add-slot-btn" onclick="addSlot()">
-            + Thêm video phụ <span id="slot-count-hint" style="margin-left:4px;font-size:11px;color:var(--text-dim)">(tối đa 5)</span>
+            + Thêm video phụ <span id="slot-count-hint" style="margin-left:4px;font-size:11px;color:var(--text-dim)">(tối đa 7)</span>
           </button>
         </div>
         <div class="form-group">
@@ -812,6 +838,10 @@
               <span>Thêm danh sách link thật dưới video (chỉ chế độ Mã nhúng Web)</span>
             </div>
           </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">SĐT riêng dòng "Hàng kín" <span class="form-label-sub">data-kin-phone · tùy chọn · bỏ trống = số mặc định · chỉ chế độ Mã nhúng Web có video</span></label>
+          <input class="form-input" id="v-kin-phone" type="text" inputmode="tel" autocomplete="off" placeholder="VD: 0912 345 678"/>
         </div>
       </div>
 
@@ -2941,11 +2971,11 @@ function _cartSeoLines(items){
 }
 
 function addSlot(){
-  if(activeSlots>=5)return;
+  if(activeSlots>=7)return;
   activeSlots++;
   document.getElementById('slot-'+activeSlots).style.display='flex';
-  if(activeSlots>=5)document.getElementById('add-slot-btn').disabled=true;
-  document.getElementById('slot-count-hint').textContent=activeSlots>=5?'(đã đủ 5)':'(tối đa 5)';
+  if(activeSlots>=7)document.getElementById('add-slot-btn').disabled=true;
+  document.getElementById('slot-count-hint').textContent=activeSlots>=7?'(đã đủ 7)':'(tối đa 7)';
 }
 function detectType(n){
   var url=document.getElementById('url-'+n).value.trim().toLowerCase();
@@ -3277,6 +3307,7 @@ function _getFormData(block){
           vTitle:document.getElementById('v-title').value.trim(),
           vDesc:document.getElementById('v-desc').value.trim(),
           vKeywords:document.getElementById('v-keywords').value.trim(),
+          kinPhone:(document.getElementById('v-kin-phone')||{value:''}).value.trim(),
           cart:_cartRaw(),cartSeo:cartSeoActive};
       }
       case 'title':
@@ -3365,7 +3396,7 @@ function _applyFormData(block,data){
     switch(block){
       case 'video':{
         var urls=data.urls||[],labels=data.labels||[];
-        for(var i=0;i<urls.length&&i<5;i++){
+        for(var i=0;i<urls.length&&i<7;i++){
           var slot=i+1;
           while(activeSlots<slot)addSlot();
           var u=document.getElementById('url-'+slot);if(u)u.value=urls[i]||'';
@@ -3375,6 +3406,7 @@ function _applyFormData(block,data){
         document.getElementById('v-title').value=data.vTitle||'';
         document.getElementById('v-desc').value=data.vDesc||'';
         document.getElementById('v-keywords').value=data.vKeywords||'';
+        var _kpEl=document.getElementById('v-kin-phone');if(_kpEl)_kpEl.value=data.kinPhone||'';
         _applyCartData(data);
         return true;
       }
@@ -3484,6 +3516,26 @@ function _applyFormData(block,data){
     }
   }catch(e){return false;}
 }
+// Chuẩn hóa SĐT riêng (khớp quy tắc trang cuối): chỉ giữ chữ số, 84+9 số → 0+9 số, hợp lệ 9–11 số
+function _kinPhoneNorm(s){
+  var raw=String(s||''),out='',i,c;
+  for(i=0;i<raw.length;i++){c=raw.charAt(i);if(c>='0'&&c<='9')out+=c;}
+  if(out.slice(0,2)==='84'&&out.length===11)out='0'+out.slice(2);
+  return(out.length>=9&&out.length<=11)?out:'';
+}
+// SĐT sai: bỏ code video cũ để không Copy nhầm bản không có / có số khác (giống bước dọn trong Reset tab)
+function _discardVideoOutput(){
+  delete blockCodes[currentBlock];
+  var bd=document.getElementById('badge-'+currentBlock);
+  if(bd){bd.style.display='none';bd.className='block-badge';bd.textContent='✓';}
+  document.querySelectorAll('[data-block="'+currentBlock+'"]').forEach(function(it){it.classList.remove('done');});
+  generatedCode='';
+  document.getElementById('code-output-empty').style.display='flex';
+  document.getElementById('code-output').style.display='none';
+  updatePreviewFrame('');
+  updateCopyButtons();
+  if(typeof syncSheetContent==='function')syncSheetContent();
+}
 // Generate
 function generateCode(){
   var code='';
@@ -3521,6 +3573,12 @@ function generateCode(){
         if(vd)lines.push('  data-description="'+vd+'"');
         if(vk)lines.push('  data-keywords="'+vk+'"');
         for(var j=2;j<=activeSlots;j++){var lbl=document.getElementById('label-'+j).value.trim();var uj=document.getElementById('url-'+j).value.trim();if(lbl&&uj)lines.push('  data-label-'+j+'="'+lbl+'"');}
+        var kpRaw=document.getElementById('v-kin-phone').value.trim();
+        if(kpRaw){
+          var kpN=_kinPhoneNorm(kpRaw);
+          if(!kpN){_discardVideoOutput();_setHint('⚠ SĐT Hàng kín không hợp lệ (cần 9–11 chữ số) — sửa lại hoặc để trống để dùng số mặc định',2);return;}
+          lines.push('  data-kin-phone="'+kpN+'"');
+        }
         var _ci=_cartItems();
         if(_ci.length)lines.push('  data-cart="'+_cartDataAttr(_ci)+'"');
         lines.push('>&nbsp;</div>');
@@ -4000,7 +4058,7 @@ function copyCode(source){
 }
 function _doResetBlock(){
   if(currentBlock==='video'){
-    for(var i=1;i<=5;i++){
+    for(var i=1;i<=7;i++){
       var u=document.getElementById('url-'+i);if(u)u.value='';
       var t=document.getElementById('type-'+i);if(t){t.textContent='—';t.className='video-type-badge vtype-empty';}
       if(i>=2){var s=document.getElementById('slot-'+i);if(s)s.style.display='none';var l=document.getElementById('label-'+i);if(l)l.value='';}
@@ -4008,9 +4066,10 @@ function _doResetBlock(){
     document.getElementById('v-title').value='';
     document.getElementById('v-desc').value='';
     document.getElementById('v-keywords').value='';
+    document.getElementById('v-kin-phone').value='';
     _cartReset();
     activeSlots=1;document.getElementById('add-slot-btn').disabled=false;
-    document.getElementById('slot-count-hint').textContent='(tối đa 5)';
+    document.getElementById('slot-count-hint').textContent='(tối đa 7)';
   }else if(currentBlock==='title'){
     document.getElementById('input-title').value='';
     wlActive=false;document.getElementById('wl-toggle').classList.remove('active');
@@ -4272,7 +4331,7 @@ document.getElementById('video-slots').addEventListener('paste', function(e) {
     var currentSlot = currentSlotMatch ? parseInt(currentSlotMatch[0]) : 1;
     detectType(currentSlot);
     var linkIndex = 1;
-    for (var i = currentSlot + 1; i <= 5; i++) {
+    for (var i = currentSlot + 1; i <= 7; i++) {
         if(linkIndex >= links.length) break;
         if(activeSlots < i) addSlot();
         document.getElementById('url-' + i).value = links[linkIndex];
@@ -4384,13 +4443,13 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('V58',size/2,size*0.82);
+    ctx.fillText('V59',size/2,size*0.82);
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i V58',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i V59',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:'https://dangtin.678.vn/',
