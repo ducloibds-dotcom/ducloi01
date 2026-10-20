@@ -2855,9 +2855,9 @@ var CART_MAX=30,cartRowN=0,cartSeoActive=true;
 var CART_HOSTS=['kenyo.vn','678.vn','alonhadat.com.vn','batdongsan.com.vn','chotot.com','nha.chotot.com','shopee.vn','shp.ee'];
 function _cartEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function _cartNorm(u){u=String(u||'').trim();if(!u)return '';if(!/^https?:\/\//i.test(u))u='https://'+u.replace(/^\/+/,'');return u;}
-/* Khóa so trùng, khớp cartKey của trang cuối (cách tính của file gốc): đường dẫn + ?query. Khác đuôi ?ref=1 là 2 sản phẩm; chỉ khác #… hoặc tên miền thì vẫn là 1 */
+/* Khóa so trùng, khớp cartKey của trang cuối: so nguyên link chuẩn hóa (new URL().href). Chỉ link giống hệt mới là 1 sản phẩm; khác đuôi ?ref=1, #…, www. hoặc tên miền đều là sản phẩm khác */
 function _cartKey(u){
-  try{var x=new URL(u);return x.pathname+x.search;}catch(e){return u;}
+  try{return new URL(u).href;}catch(e){return String(u||"");}
 }
 function _cartHost(u){try{return new URL(u).hostname.toLowerCase().replace(/^www\./,'');}catch(e){return '';}}
 function _cartHostOk(u){return CART_HOSTS.indexOf(_cartHost(u))!==-1;}
