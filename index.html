@@ -468,7 +468,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V62</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V63</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -1258,7 +1258,7 @@
           <div class="block-icon-big">▶️</div>
           <div class="block-header-text">
             <h2>Video +</h2>
-            <p>SEO video YouTube Shorts: tiêu đề H3 + khung nhúng + caption + schema VideoObject. Bỏ tick ✔ để tạm loại video khỏi code mà không cần xóa.</p>
+            <p>Tăng cường SEO cho video YouTube Shorts: mỗi video có tiêu đề H3 riêng (từ khóa + khu vực), link Shorts dạng link trần và mô tả 1–2 câu. Trang cuối tự tạo ảnh bìa và thư viện video từ link. Bỏ tick ✔ để tạm loại video khỏi code mà không cần xóa.</p>
           </div>
         </div>
         <div class="form-group">
@@ -1273,7 +1273,7 @@
           </button>
         </div>
         <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          ⚡ Dán nhiều link (mỗi dòng 1 link) vào ô link → tự tách thành nhiều video. Ảnh bìa tự lấy từ YouTube. SEO: mỗi video 1 tiêu đề riêng có từ khóa + khu vực, mô tả 1–2 câu.
+          ⚡ Dán nhiều link (mỗi dòng 1 link) vào ô link → tự tách thành nhiều video. Code chỉ xuất tiêu đề H3 + link trần + mô tả; ảnh bìa và khung phát do trang cuối tự tạo. SEO: mỗi video 1 tiêu đề riêng có từ khóa + khu vực, mô tả 1–2 câu.
         </div>
       </div>
 
@@ -3242,7 +3242,7 @@ function vpYtId(u){
   var m=u.match(/(?:youtube\.com\/(?:shorts|embed|live|v)\/|youtu\.be\/)([A-Za-z0-9_-]{11})/)||u.match(/[?&]v=([A-Za-z0-9_-]{11})/);
   return m?m[1]:'';
 }
-function vpEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function vpEsc(s){return String(s).split(String.fromCharCode(92)).join('').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function addVpRow(){
   if(activeVpRows>=MAX_VP)return;
   activeVpRows++;
@@ -3265,7 +3265,7 @@ function addVpRow(){
         vpTamOnBtn+
       '</div>'+
       '<div class="video-slot-row">'+
-        '<input class="form-input" id="vp-desc-'+n+'" type="text" placeholder="Mô tả 1–2 câu có từ khóa + khu vực (bỏ trống = lấy theo tiêu đề)" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        '<input class="form-input" id="vp-desc-'+n+'" type="text" placeholder="Mô tả 1–2 câu có từ khóa + khu vực (bỏ trống = không in dòng mô tả)" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
       '</div>'+
     '</div>';
   document.getElementById('vp-rows').appendChild(row);
@@ -3814,37 +3814,13 @@ function generateCode(){
     }
     if(!vpItems.length){_setHint('⚠ Vui lòng thêm ít nhất 1 video');return;}
     var vpHead=(document.getElementById('vp-heading').value||'').trim();
-    var vo=['<!-- KHỐI VIDEO + (SEO video YouTube Shorts) -->'];
+    var vo=['<!-- KHỐI VIDEO + (link trần: trang cuối tự tạo thumbnail) -->'];
     if(vpHead)vo.push('<h2>'+vpEsc(vpHead)+'</h2>');
-    var vld=[];
-    var vpPlay='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 4px 12px rgba(0,0,0,0.2);"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff" style="margin-left:4px;"><polygon points="6,4 20,12 6,20"/></svg></div>';
-    vo.push('<div style="margin:16px 0;">');
     vpItems.forEach(function(it){
-      var mk='position:absolute;z-index:2;background:transparent;';
-      var ifr='<iframe src="https://www.youtube.com/embed/'+it.id+'?autoplay=1&playsinline=1&rel=0&loop=1&playlist='+it.id+'&controls=0&modestbranding=1&fs=0&disablekb=1&iv_load_policy=3" title="'+vpEsc(it.title)+'" tabindex="-1" style="position:absolute;left:0;top:-70px;width:100%;height:calc(100% + 140px);border:none;overflow:hidden;background:#000;" allow="autoplay; encrypted-media; picture-in-picture"></iframe>'+
-        '<div style="'+mk+'top:0;left:0;right:0;height:calc(50% - 50px);"></div>'+
-        '<div style="'+mk+'bottom:0;left:0;right:0;height:calc(50% - 50px);"></div>'+
-        '<div style="'+mk+'top:calc(50% - 50px);left:0;width:calc(50% - 50px);height:100px;"></div>'+
-        '<div style="'+mk+'top:calc(50% - 50px);right:0;width:calc(50% - 50px);height:100px;"></div>';
-      var oc="event.preventDefault();event.stopPropagation();var c=this,g=c.parentNode.parentNode;if(window._kytValidate&&!window._kytValidate(c,1788354000))return;[].forEach.call(g.querySelectorAll('[data-kvp]'),function(o){if(o!==c&&o.__h){o.innerHTML=o.__h;o.__h=0;o.style.cursor='pointer';o.onclick=o.__c;}});c.__h=c.innerHTML;c.__c=c.onclick;c.innerHTML=decodeURIComponent('"+encodeURIComponent(ifr).replace(/'/g,'%27')+"');c.style.cursor='default';c.onclick=null;";
-      vo.push('  <div style="width:100%;max-width:270px;margin:16px auto;text-align:center;">');
-      vo.push('    <div data-kvp="1" onclick="'+oc+'" role="button" aria-label="Phát video: '+vpEsc(it.title)+'" style="position:relative;padding-bottom:177.77%;height:0;overflow:hidden;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);cursor:pointer;background:linear-gradient(135deg,#282828,#000);">');
-      vo.push('      <img src="https://img.youtube.com/vi/'+it.id+'/hqdefault.jpg" alt="'+vpEsc(it.title)+'" title="'+vpEsc(it.title)+'" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.75;" />');
-      vo.push('      '+vpPlay);
-      vo.push('    </div>');
-      vo.push('    <h3 style="font-size:13px;line-height:1.35;margin:8px 0 2px;">'+vpEsc(it.title)+'</h3>');
-      if(it.desc!==it.title)vo.push('    <p style="font-size:12px;line-height:1.35;color:#666;margin:0;"><em>'+vpEsc(it.desc)+'</em></p>');
-      vo.push('  </div>');
-      var ldo={'@context':'https://schema.org','@type':'VideoObject','name':it.title,'description':it.desc,
-        'thumbnailUrl':['https://img.youtube.com/vi/'+it.id+'/hqdefault.jpg'],
-        'embedUrl':'https://www.youtube.com/embed/'+it.id,'inLanguage':'vi'};
-      vld.push(ldo);
+      vo.push('<h3>'+vpEsc(it.title)+'</h3>');
+      vo.push('<div>https://www.youtube.com/shorts/'+it.id+'</div>');
+      if(it.desc!==it.title)vo.push('<p><em>'+vpEsc(it.desc)+'</em></p>');
     });
-    vo.push('</div>');
-    vo.push('');
-    vo.push('<script type="application/ld+json">');
-    vo.push(JSON.stringify(vld.length===1?vld[0]:vld,null,2).replace(/</g,'\\u003c'));
-    vo.push('<\/script>');
     code=vo.join('\n');
 
   }else if(currentBlock==='clock'){
@@ -4479,13 +4455,13 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('V62',size/2,size*0.82);
+    ctx.fillText('V63',size/2,size*0.82);
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i V62',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i V63',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:'https://dangtin.678.vn/',
