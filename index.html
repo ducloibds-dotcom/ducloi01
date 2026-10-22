@@ -468,7 +468,7 @@
 </head>
 <body>
 <div class="header">
-  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V59</span></div>
+  <div class="logo"><b style="color:var(--accent2);font-weight:700;font-style:normal;">Đức Lợi</b> <span>V62</span></div>
   <div class="header-dot"></div>
   <div class="header-title">Tạo code HTML trang chi tiết BĐS</div>
   <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
@@ -577,10 +577,10 @@
     </div>
     
    
-    <div class="mobile-nav-item" data-block="phaply" onclick="switchBlock('phaply')">
-      <span class="mobile-nav-icon">⚖️</span>
-      <span>Pháp lý</span>
-      <span class="mobile-nav-dot" id="mdot-phaply"></span>
+    <div class="mobile-nav-item" data-block="videoplus" onclick="switchBlock('videoplus')">
+      <span class="mobile-nav-icon">▶️</span>
+      <span>Video +</span>
+      <span class="mobile-nav-dot" id="mdot-videoplus"></span>
     </div>
     <div class="mobile-nav-item" data-block="images" onclick="switchBlock('images')">
       <span class="mobile-nav-icon">🖼️</span>
@@ -682,9 +682,9 @@
     </div>
     
     
-    <div class="block-item" data-block="phaply" onclick="switchBlock('phaply')">
-      <span class="block-icon">⚖️</span>Pháp lý
-      <span class="block-badge done" id="badge-phaply" style="display:none">✓</span>
+    <div class="block-item" data-block="videoplus" onclick="switchBlock('videoplus')">
+      <span class="block-icon">▶️</span>Video +
+      <span class="block-badge done" id="badge-videoplus" style="display:none">✓</span>
     </div>
     <div class="block-item" data-block="images" onclick="switchBlock('images')">
       <span class="block-icon">🖼️</span>Ảnh
@@ -1197,7 +1197,7 @@
           <div class="block-icon-big">🖼️</div>
           <div class="block-header-text">
             <h2>Khối Ảnh</h2>
-            <p>Nhiều ảnh, mỗi ảnh có caption/alt/title riêng. Viết caption ảnh 1 → bấm "✓ Tạm ổn" để đồng bộ caption/alt/title cho tất cả ảnh, vẫn sửa lại được từng ảnh sau đó. Bỏ tick ✔ ở đầu ảnh để tạm loại khỏi code lúc đăng mà không cần xóa.</p>
+            <p>Nhiều ảnh, mỗi ảnh có caption/alt/title riêng. Viết caption ảnh 1 → bấm "✓ Tạm ổn" để đồng bộ caption/alt/title cho tất cả ảnh (tự thêm - Ảnh 1, Ảnh 2... ở cuối), vẫn sửa lại được từng ảnh sau đó. Bỏ tick ✔ ở đầu ảnh để tạm loại khỏi code lúc đăng mà không cần xóa.</p>
           </div>
         </div>
         <div class="form-group">
@@ -1218,7 +1218,7 @@
           <div class="block-icon-big">📕</div>
           <div class="block-header-text">
             <h2>Khối Ảnh sổ</h2>
-            <p>Nút "Nhấn xem hình ảnh sổ" + gallery ẩn hiện khi bấm. Viết caption ảnh 1 → bấm "✓ Tạm ổn" để đồng bộ caption/alt cho tất cả ảnh. Bỏ tick ✔ để tạm loại ảnh khỏi code mà không cần xóa.</p>
+            <p>Nút "Nhấn xem hình ảnh sổ" + gallery ẩn hiện khi bấm. Viết caption ảnh 1 → bấm "✓ Tạm ổn" để đồng bộ caption/alt/title cho tất cả ảnh (tự thêm - Ảnh 1, Ảnh 2... ở cuối). Bỏ tick ✔ để tạm loại ảnh khỏi code mà không cần xóa.</p>
           </div>
         </div>
         <div class="form-group">
@@ -1252,43 +1252,28 @@
         </div>
       </div>
 
-      <!-- ── BLOCK: PHÁP LÝ ── -->
-      <div id="block-phaply" style="display:none">
+      <!-- ── BLOCK: VIDEO + ── -->
+      <div id="block-videoplus" style="display:none">
         <div class="block-header">
-          <div class="block-icon-big">⚖️</div>
+          <div class="block-icon-big">▶️</div>
           <div class="block-header-text">
-            <h2>Khối Pháp lý</h2>
-            <p>Nút "Nhấn xem hồ sơ pháp lý" + gallery nhúng iframe (Google Drive/Docs...) ẩn hiện khi bấm. Bỏ tick ✔ để tạm loại mục khỏi code mà không cần xóa.</p>
+            <h2>Video +</h2>
+            <p>SEO video YouTube Shorts: tiêu đề H3 + khung nhúng + caption + schema VideoObject. Bỏ tick ✔ để tạm loại video khỏi code mà không cần xóa.</p>
           </div>
         </div>
         <div class="form-group">
-          <label class="form-label">Chọn mẫu</label>
-          <div class="mau-selector">
-            <button class="mau-btn active" id="pl-mau-btn-1" onclick="selectPlMau(1)">
-              <strong>⚖️ Mẫu 1 — Cơ bản</strong>
-              <span>Chỉ nút xem hồ sơ + gallery iframe</span>
-            </button>
-            <button class="mau-btn" id="pl-mau-btn-2" onclick="selectPlMau(2)">
-              <strong>⚖️ Mẫu 2 — Có số chủ</strong>
-              <span>Thêm số điện thoại chủ vào nút</span>
-            </button>
-          </div>
-        </div>
-        <div class="form-group" id="pl-phone-group" style="display:none">
-          <label class="form-label">Họ và tên chủ <span class="form-label-sub">data-owner-name</span></label>
-          <input class="form-input" id="pl-owner-name" type="text" placeholder="VD: Nguyễn Văn A" style="margin-bottom:12px"/>
-          <label class="form-label">Số điện thoại chủ <span class="form-label-sub">data-owner-phone</span></label>
-          <input class="form-input" id="pl-owner-phone" type="text" placeholder="VD: 0888 838 022"/>
+          <label class="form-label">Tiêu đề khối (H2) <span class="form-label-sub">không bắt buộc</span></label>
+          <input class="form-input" id="vp-heading" type="text" placeholder="VD: VIDEO THỰC TẾ NHÀ ĐẤT TÂN PHÚ (không bắt buộc, bỏ trống = không có H2)"/>
         </div>
         <div class="form-group">
-          <label class="form-label">Danh sách hồ sơ (caption + link nhúng) <span class="slot-required">* bắt buộc ít nhất 1</span></label>
-          <div class="video-slots" id="pl-rows"></div>
-          <button class="add-slot-btn" id="add-pl-btn" onclick="addPlRow()">
-            + Thêm hồ sơ <span id="pl-count-hint" style="margin-left:4px;font-size:11px;color:var(--text-dim)"></span>
+          <label class="form-label">Danh sách video (tiêu đề + link Shorts) <span class="slot-required">* bắt buộc ít nhất 1</span></label>
+          <div class="video-slots" id="vp-rows"></div>
+          <button class="add-slot-btn" id="add-vp-btn" onclick="addVpRow()">
+            + Thêm video <span id="vp-count-hint" style="margin-left:4px;font-size:11px;color:var(--text-dim)"></span>
           </button>
         </div>
         <div class="form-group" style="font-size:11px;color:var(--text-dim);padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border);">
-          ⚡ Dùng link nhúng (embed) từ Google Drive/Docs — không phải link tải xuống trực tiếp.
+          ⚡ Dán nhiều link (mỗi dòng 1 link) vào ô link → tự tách thành nhiều video. Ảnh bìa tự lấy từ YouTube. SEO: mỗi video 1 tiêu đề riêng có từ khóa + khu vực, mô tả 1–2 câu.
         </div>
       </div>
 
@@ -2789,11 +2774,11 @@ function onHistoryBtnClick(){
   }
 }
 
-var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',phaply:'⚖️ Pháp lý',gopy:'💬 Góp ý'};
-var ALL_BLOCKS=['video','title','address','specs','finance','legaldoc','map','cta','aitools','clock','phaply','images','gopy'];
+var BLOCK_LABELS={video:'🎬 Video',title:'🏷️ Tiêu đề, fb',address:'📍 Địa chỉ, fb',specs:'📋 Thông số BĐS, fb',finance:'💵 Tài chính',aitools:'🤖 Công cụ AI',cta:'🔗 Liên hệ, fb',map:'🗺️ Bản đồ, fb',clock:'🕐 Đồng hồ',images:'🖼️ Ảnh',legaldoc:'📕 Ảnh sổ',videoplus:'▶️ Video +',gopy:'💬 Góp ý'};
+var ALL_BLOCKS=['video','title','address','specs','finance','legaldoc','map','cta','aitools','clock','videoplus','images','gopy'];
 var activeImgSlots=0,MAX_IMG=30;
 var activeLegalImgSlots=0,MAX_LEGAL_IMG=100,currentLegalMau=1;
-var activePlRows=0,MAX_PL=20,currentPlMau=1;
+var activeVpRows=0,MAX_VP=20;
 var aiBlocks={forecast:false,offer:false,owner:false,need:false};
 
 function toggleAiBlock(name){
@@ -2843,7 +2828,7 @@ function switchBlock(name){
   var mobileItem=document.querySelector('.mobile-nav-item[data-block="'+name+'"]');
   if(mobileItem)mobileItem.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   currentBlock=name;
-  var hints={video:'Điền link video rồi bấm tạo code',title:'Nhập tiêu đề rồi bấm tạo code',address:'Nhập địa chỉ rồi bấm tạo code',specs:'Paste/nhập thông số rồi bấm tạo code',finance:'Chọn mẫu, điền giá rồi bấm tạo code',map:'Dán thẻ iframe bản đồ rồi bấm tạo code',cta:'Điền số điện thoại rồi bấm tạo code',images:'Điền link ảnh + caption rồi bấm tạo code',legaldoc:'Chọn mẫu, điền ảnh sổ rồi bấm tạo code',phaply:'Chọn mẫu, điền hồ sơ pháp lý rồi bấm tạo code',clock:'Bấm tạo code để chèn khối đồng hồ',aitools:'Bật các khối AI muốn dùng rồi bấm tạo code',gopy:'Bấm tạo code để chèn khối góp ý'};
+  var hints={video:'Điền link video rồi bấm tạo code',title:'Nhập tiêu đề rồi bấm tạo code',address:'Nhập địa chỉ rồi bấm tạo code',specs:'Paste/nhập thông số rồi bấm tạo code',finance:'Chọn mẫu, điền giá rồi bấm tạo code',map:'Dán thẻ iframe bản đồ rồi bấm tạo code',cta:'Điền số điện thoại rồi bấm tạo code',images:'Điền link ảnh + caption rồi bấm tạo code',legaldoc:'Chọn mẫu, điền ảnh sổ rồi bấm tạo code',videoplus:'Điền tiêu đề + link Shorts rồi bấm tạo code',clock:'Bấm tạo code để chèn khối đồng hồ',aitools:'Bật các khối AI muốn dùng rồi bấm tạo code',gopy:'Bấm tạo code để chèn khối góp ý'};
   _setHint(hints[name]||'Điền thông tin rồi bấm tạo code');
   updateHistoryBtn(name);
   document.getElementById('history-dropdown').classList.remove('open');
@@ -3141,7 +3126,7 @@ function addImgRow(){
   var row=document.createElement('div');
   row.className='video-slot';
   row.id='img-slot-'+n;
-  var tamOnBtn=n===1?'<button type="button" class="btn-apply" onclick="applyCaptionAll()">✓ Tạm ổn</button>':'';
+  var tamOnBtn=n===1?'<button type="button" class="btn-apply" onclick="applyCaptionAll()" title="Nhân bản caption/alt/title của ảnh 1 sang tất cả ảnh, tự thêm - Ảnh 1, Ảnh 2...">✓ Tạm ổn</button>':'';
   row.innerHTML=
     '<div class="video-slot-num" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;">'+
       '<input type="checkbox" id="img-inc-'+n+'" checked onchange="toggleImgRow('+n+')" title="Bỏ tick để tạm loại ảnh này khỏi code, không cần xóa" style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent);"/>'+
@@ -3183,7 +3168,7 @@ function addLegalImgRow(){
   var row=document.createElement('div');
   row.className='video-slot';
   row.id='legal-img-slot-'+n;
-  var legalTamOnBtn=n===1?'<button type="button" class="btn-apply" onclick="applyLegalCaptionAll()">✓ Tạm ổn</button>':'';
+  var legalTamOnBtn=n===1?'<button type="button" class="btn-apply" onclick="applyLegalCaptionAll()" title="Nhân bản caption/alt/title của ảnh 1 sang tất cả ảnh, tự thêm - Ảnh 1, Ảnh 2...">✓ Tạm ổn</button>':'';
   row.innerHTML=
     '<div class="video-slot-num" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;">'+
       '<input type="checkbox" id="legal-img-inc-'+n+'" checked onchange="toggleLegalImgRow('+n+')" title="Bỏ tick để tạm loại ảnh này khỏi code, không cần xóa" style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent);"/>'+
@@ -3222,15 +3207,20 @@ function updateImgHint(){
   if(activeImgSlots>=MAX_IMG){hint.textContent='(đã đủ '+MAX_IMG+')';btn.disabled=true;}
   else{hint.textContent='('+activeImgSlots+' ảnh)';btn.disabled=false;}
 }
+function _imgSuffix(cap,i,total){
+  cap=String(cap||'').trim().replace(/\s*[-–—]\s*Ảnh\s*\d+\s*$/i,'');
+  return (cap&&total>1)?cap+' - Ảnh '+i:cap;
+}
 function applyCaptionAll(){
   var cap=document.getElementById('img-caption-1').value;
   for(var i=1;i<=activeImgSlots;i++){
     var capEl=document.getElementById('img-caption-'+i);
     var altEl=document.getElementById('img-alt-'+i);
     var ttlEl=document.getElementById('img-title-'+i);
-    if(capEl)capEl.value=cap;
-    if(altEl)altEl.value=cap;
-    if(ttlEl)ttlEl.value=cap;
+    var v=_imgSuffix(cap,i,activeImgSlots);
+    if(capEl)capEl.value=v;
+    if(altEl)altEl.value=v;
+    if(ttlEl)ttlEl.value=v;
   }
 }
 function applyLegalCaptionAll(){
@@ -3239,52 +3229,68 @@ function applyLegalCaptionAll(){
     var capEl=document.getElementById('legal-img-caption-'+i);
     var altEl=document.getElementById('legal-img-alt-'+i);
     var ttlEl=document.getElementById('legal-img-title-'+i);
-    if(capEl)capEl.value=cap;
-    if(altEl)altEl.value=cap;
-    if(ttlEl)ttlEl.value=cap;
+    var v=_imgSuffix(cap,i,activeLegalImgSlots);
+    if(capEl)capEl.value=v;
+    if(altEl)altEl.value=v;
+    if(ttlEl)ttlEl.value=v;
   }
 }
 
-// Pháp lý (docGallery2 / iframe)
-function selectPlMau(n){
-  currentPlMau=n;
-  document.getElementById('pl-mau-btn-1').className='mau-btn'+(n===1?' active':'');
-  document.getElementById('pl-mau-btn-2').className='mau-btn'+(n===2?' active':'');
-  document.getElementById('pl-phone-group').style.display=n===2?'block':'none';
+// Video + (SEO video YouTube Shorts)
+function vpYtId(u){
+  u=(u||'').trim();
+  var m=u.match(/(?:youtube\.com\/(?:shorts|embed|live|v)\/|youtu\.be\/)([A-Za-z0-9_-]{11})/)||u.match(/[?&]v=([A-Za-z0-9_-]{11})/);
+  return m?m[1]:'';
 }
-function addPlRow(){
-  if(activePlRows>=MAX_PL)return;
-  activePlRows++;
-  var n=activePlRows;
+function vpEsc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function addVpRow(){
+  if(activeVpRows>=MAX_VP)return;
+  activeVpRows++;
+  var n=activeVpRows;
   var row=document.createElement('div');
   row.className='video-slot';
-  row.id='pl-slot-'+n;
+  row.id='vp-slot-'+n;
+  var vpTamOnBtn=n===1?'<button type="button" class="btn-apply" onclick="applyVpAll()" title="Nhân bản tiêu đề + mô tả của video 1 sang tất cả video, tự thêm Phần 1, Phần 2...">✓ Tạm ổn</button>':'';
   row.innerHTML=
     '<div class="video-slot-num" style="display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;">'+
-      '<input type="checkbox" id="pl-inc-'+n+'" checked onchange="togglePlRow('+n+')" title="Bỏ tick để tạm loại mục này khỏi code, không cần xóa" style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent);"/>'+
+      '<input type="checkbox" id="vp-inc-'+n+'" checked onchange="toggleVpRow('+n+')" title="Bỏ tick để tạm loại video này khỏi code, không cần xóa" style="width:15px;height:15px;cursor:pointer;accent-color:var(--accent);"/>'+
       '<span>'+n+'</span>'+
     '</div>'+
     '<div class="video-slot-main">'+
       '<div class="video-slot-row">'+
-        '<input class="form-input" id="pl-caption-'+n+'" type="text" placeholder="Caption VD: GIẤY CHỨNG NHẬN QUYỀN SỬ DỤNG ĐẤT" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        '<input class="video-slot-url" id="vp-link-'+n+'" type="text" placeholder="Link Shorts VD: https://youtube.com/shorts/xxxxxxxxxxx"/>'+
       '</div>'+
       '<div class="video-slot-row">'+
-        '<input class="video-slot-url" id="pl-link-'+n+'" type="text" placeholder="Link nhúng (embed) VD: https://drive.google.com/file/d/.../preview"/>'+
+        '<input class="form-input" id="vp-title-'+n+'" type="text" placeholder="Tiêu đề VD: Video thực tế nhà 5x20 đường Nguyễn Văn Linh" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
+        vpTamOnBtn+
+      '</div>'+
+      '<div class="video-slot-row">'+
+        '<input class="form-input" id="vp-desc-'+n+'" type="text" placeholder="Mô tả 1–2 câu có từ khóa + khu vực (bỏ trống = lấy theo tiêu đề)" style="flex:1;width:auto;background:var(--bg);font-size:13px;padding:7px 10px;"/>'+
       '</div>'+
     '</div>';
-  document.getElementById('pl-rows').appendChild(row);
-  updatePlHint();
+  document.getElementById('vp-rows').appendChild(row);
+  updateVpHint();
 }
-function togglePlRow(n){
-  var chk=document.getElementById('pl-inc-'+n);
-  var row=document.getElementById('pl-slot-'+n);
+function applyVpAll(){
+  var t=document.getElementById('vp-title-1').value.trim().replace(/\s*[-–—]\s*Phần\s*\d+\s*$/i,'');
+  var d=document.getElementById('vp-desc-1').value;
+  for(var i=1;i<=activeVpRows;i++){
+    var tEl=document.getElementById('vp-title-'+i);
+    var dEl=document.getElementById('vp-desc-'+i);
+    if(tEl)tEl.value=(t&&activeVpRows>1)?t+' - Phần '+i:t;
+    if(dEl&&i>1)dEl.value=d;
+  }
+}
+function toggleVpRow(n){
+  var chk=document.getElementById('vp-inc-'+n);
+  var row=document.getElementById('vp-slot-'+n);
   if(chk&&row)row.style.opacity=chk.checked?'1':'0.4';
 }
-function updatePlHint(){
-  var hint=document.getElementById('pl-count-hint');
-  var btn=document.getElementById('add-pl-btn');
-  if(activePlRows>=MAX_PL){hint.textContent='(đã đủ '+MAX_PL+')';btn.disabled=true;}
-  else{hint.textContent='('+activePlRows+' mục)';btn.disabled=false;}
+function updateVpHint(){
+  var hint=document.getElementById('vp-count-hint');
+  var btn=document.getElementById('add-vp-btn');
+  if(activeVpRows>=MAX_VP){hint.textContent='(đã đủ '+MAX_VP+')';btn.disabled=true;}
+  else{hint.textContent='('+activeVpRows+' video)';btn.disabled=false;}
 }
 
 // Helpers
@@ -3367,22 +3373,21 @@ function _getFormData(block){
           ownerPhone:document.getElementById('legal-owner-phone').value.trim(),
           mau:currentLegalMau};
       }
-      case 'phaply':{
-        var pitems=[];
-        for(var pi=1;pi<=activePlRows;pi++){
-          var pLinkEl=document.getElementById('pl-link-'+pi);
-          if(!pLinkEl)continue;
-          var pIncEl=document.getElementById('pl-inc-'+pi);
-          pitems.push({
-            src:pLinkEl.value.trim(),
-            caption:(document.getElementById('pl-caption-'+pi)||{}).value?document.getElementById('pl-caption-'+pi).value.trim():'',
-            inc:pIncEl?pIncEl.checked:true
+      case 'videoplus':{
+        var vitems=[];
+        for(var vi=1;vi<=activeVpRows;vi++){
+          var vLinkEl=document.getElementById('vp-link-'+vi);
+          if(!vLinkEl)continue;
+          var vIncEl=document.getElementById('vp-inc-'+vi);
+          vitems.push({
+            src:vLinkEl.value.trim(),
+            title:(document.getElementById('vp-title-'+vi).value||'').trim(),
+            desc:(document.getElementById('vp-desc-'+vi).value||'').trim(),
+            inc:vIncEl?vIncEl.checked:true
           });
         }
-        return {items:pitems,
-          ownerName:document.getElementById('pl-owner-name').value.trim(),
-          ownerPhone:document.getElementById('pl-owner-phone').value.trim(),
-          mau:currentPlMau};
+        return {items:vitems,
+          heading:document.getElementById('vp-heading').value.trim()};
       }
       case 'aitools':
         return {forecast:aiBlocks.forecast,offer:aiBlocks.offer,owner:aiBlocks.owner,need:aiBlocks.need,
@@ -3486,22 +3491,21 @@ function _applyFormData(block,data){
         selectLegalMau(data.mau===2?2:1);
         return true;
       }
-      case 'phaply':{
-        if(currentBlock==='phaply')return false;
-        document.getElementById('pl-rows').innerHTML='';
-        activePlRows=0;
+      case 'videoplus':{
+        if(currentBlock==='videoplus')return false;
+        document.getElementById('vp-rows').innerHTML='';
+        activeVpRows=0;
         (data.items||[]).forEach(function(it){
-          addPlRow();
-          var n=activePlRows;
-          var linkEl=document.getElementById('pl-link-'+n);if(linkEl)linkEl.value=it.src||'';
-          var capEl=document.getElementById('pl-caption-'+n);if(capEl)capEl.value=it.caption||'';
-          if(it.inc===false){var chk=document.getElementById('pl-inc-'+n);if(chk){chk.checked=false;togglePlRow(n);}}
+          addVpRow();
+          var n=activeVpRows;
+          var linkEl=document.getElementById('vp-link-'+n);if(linkEl)linkEl.value=it.src||'';
+          var tEl=document.getElementById('vp-title-'+n);if(tEl)tEl.value=it.title||'';
+          var dEl=document.getElementById('vp-desc-'+n);if(dEl)dEl.value=it.desc||'';
+          if(it.inc===false){var chk=document.getElementById('vp-inc-'+n);if(chk){chk.checked=false;toggleVpRow(n);}}
         });
-        if(activePlRows===0)addPlRow();
-        updatePlHint();
-        document.getElementById('pl-owner-name').value=data.ownerName||'';
-        document.getElementById('pl-owner-phone').value=data.ownerPhone||'';
-        selectPlMau(data.mau===2?2:1);
+        if(activeVpRows===0)addVpRow();
+        updateVpHint();
+        document.getElementById('vp-heading').value=data.heading||'';
         return true;
       }
       case 'aitools':{
@@ -3788,48 +3792,60 @@ function generateCode(){
     dl.push('</div>');
     code=dl.join('\n');
 
-  }else if(currentBlock==='phaply'){
-    var hasPlAny=false;
-    var plGalleryLines=[];
-    for(var pi=1;pi<=activePlRows;pi++){
-      var pLinkEl=document.getElementById('pl-link-'+pi);
-      if(!pLinkEl)continue;
-      var pIncEl=document.getElementById('pl-inc-'+pi);
-      if(pIncEl&&!pIncEl.checked)continue;
-      var pLink=pLinkEl.value.trim();
-      if(!pLink)continue;
-      hasPlAny=true;
-      var pCap=(document.getElementById('pl-caption-'+pi).value||'').trim();
-      if(plGalleryLines.length>0)plGalleryLines.push('');
-      plGalleryLines.push('    <p style="font-size:15px;font-weight:bold;"><strong>'+pCap+'</strong></p>');
-      plGalleryLines.push('    <iframe loading="lazy" src="'+pLink+'" width="100%" height="800" style="border:none;margin-top:25px;"></iframe>');
+  }else if(currentBlock==='videoplus'){
+    var vpItems=[];
+    for(var vi=1;vi<=activeVpRows;vi++){
+      var vLinkEl=document.getElementById('vp-link-'+vi);
+      if(!vLinkEl)continue;
+      var vIncEl=document.getElementById('vp-inc-'+vi);
+      if(vIncEl&&!vIncEl.checked)continue;
+      var vLink=vLinkEl.value.trim();
+      if(!vLink)continue;
+      var vId=vpYtId(vLink);
+      if(!vId){_setHint('⚠ Video '+vi+': link YouTube không hợp lệ');return;}
+      var vTtl=(document.getElementById('vp-title-'+vi).value||'').trim();
+      if(!vTtl){_setHint('⚠ Video '+vi+': thiếu tiêu đề (cần cho SEO)');return;}
+      var vDsc=(document.getElementById('vp-desc-'+vi).value||'').trim();
+      for(var vk=0;vk<vpItems.length;vk++){
+        if(vpItems[vk].id===vId){_setHint('⚠ Video '+vi+' trùng link với video '+vpItems[vk].no+' — mỗi video chỉ khai báo 1 lần');return;}
+        if(vpItems[vk].title.toLowerCase()===vTtl.toLowerCase()){_setHint('⚠ Video '+vi+' trùng tiêu đề với video '+vpItems[vk].no+' — mỗi video cần tiêu đề riêng (bấm ✓ Tạm ổn để tự đánh số Phần)');return;}
+      }
+      vpItems.push({no:vi,id:vId,title:vTtl,desc:vDsc||vTtl});
     }
-    if(!hasPlAny){_setHint('⚠ Vui lòng thêm ít nhất 1 hồ sơ pháp lý');return;}
-    var plOwnerName=document.getElementById('pl-owner-name').value.trim();
-    var plOwnerPhone=document.getElementById('pl-owner-phone').value.trim();
-    var pl=[];
-    pl.push('<!-- Bạn bị phát hiện đang xem source nguồn -->');
-    pl.push('<!-- Chúng tôi không mã hóa nhưng biết điều đó -->');
-    pl.push('<!-- Hành vi ăn cắp thông tin là không tốt! -->');
-    pl.push('<div class="contact-area" style="margin:40px 0;">');
-    if(currentPlMau===2&&(plOwnerName||plOwnerPhone)){
-      var plAttrLines=['    <div class="btn-price js-open-popup"','         data-type="doc2"'];
-      if(plOwnerName)plAttrLines.push('         data-owner-name="'+plOwnerName+'"');
-      if(plOwnerPhone)plAttrLines.push('         data-owner-phone="'+plOwnerPhone+'"');
-      plAttrLines[plAttrLines.length-1]+='>';
-      pl=pl.concat(plAttrLines);
-    }else{
-      pl.push('    <div class="btn-price js-open-popup" data-type="doc2">');
-    }
-    pl.push('        <span style="font-size:20pt;color:#ff0000;">📕 <span class="price-text">NHẤN VÀO ĐỂ XEM HỒ SƠ PHÁP LÝ</span></span>');
-    pl.push('    </div>');
-    pl.push('</div>');
-    pl.push('');
-    pl.push('<div id="docGallery2" hidden>');
-    pl.push('    <h3>HỒ SƠ PHÁP LÝ</h3>');
-    pl=pl.concat(plGalleryLines);
-    pl.push('</div>');
-    code=pl.join('\n');
+    if(!vpItems.length){_setHint('⚠ Vui lòng thêm ít nhất 1 video');return;}
+    var vpHead=(document.getElementById('vp-heading').value||'').trim();
+    var vo=['<!-- KHỐI VIDEO + (SEO video YouTube Shorts) -->'];
+    if(vpHead)vo.push('<h2>'+vpEsc(vpHead)+'</h2>');
+    var vld=[];
+    var vpPlay='<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:60px;height:60px;background:rgba(255,255,255,0.25);border-radius:50%;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);box-shadow:0 4px 12px rgba(0,0,0,0.2);"><svg viewBox="0 0 24 24" width="30" height="30" fill="#fff" style="margin-left:4px;"><polygon points="6,4 20,12 6,20"/></svg></div>';
+    vo.push('<div style="margin:16px 0;">');
+    vpItems.forEach(function(it){
+      var mk='position:absolute;z-index:2;background:transparent;';
+      var ifr='<iframe src="https://www.youtube.com/embed/'+it.id+'?autoplay=1&playsinline=1&rel=0&loop=1&playlist='+it.id+'&controls=0&modestbranding=1&fs=0&disablekb=1&iv_load_policy=3" title="'+vpEsc(it.title)+'" tabindex="-1" style="position:absolute;left:0;top:-70px;width:100%;height:calc(100% + 140px);border:none;overflow:hidden;background:#000;" allow="autoplay; encrypted-media; picture-in-picture"></iframe>'+
+        '<div style="'+mk+'top:0;left:0;right:0;height:calc(50% - 50px);"></div>'+
+        '<div style="'+mk+'bottom:0;left:0;right:0;height:calc(50% - 50px);"></div>'+
+        '<div style="'+mk+'top:calc(50% - 50px);left:0;width:calc(50% - 50px);height:100px;"></div>'+
+        '<div style="'+mk+'top:calc(50% - 50px);right:0;width:calc(50% - 50px);height:100px;"></div>';
+      var oc="event.preventDefault();event.stopPropagation();var c=this,g=c.parentNode.parentNode;if(window._kytValidate&&!window._kytValidate(c,1788354000))return;[].forEach.call(g.querySelectorAll('[data-kvp]'),function(o){if(o!==c&&o.__h){o.innerHTML=o.__h;o.__h=0;o.style.cursor='pointer';o.onclick=o.__c;}});c.__h=c.innerHTML;c.__c=c.onclick;c.innerHTML=decodeURIComponent('"+encodeURIComponent(ifr).replace(/'/g,'%27')+"');c.style.cursor='default';c.onclick=null;";
+      vo.push('  <div style="width:100%;max-width:270px;margin:16px auto;text-align:center;">');
+      vo.push('    <div data-kvp="1" onclick="'+oc+'" role="button" aria-label="Phát video: '+vpEsc(it.title)+'" style="position:relative;padding-bottom:177.77%;height:0;overflow:hidden;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,0.15);cursor:pointer;background:linear-gradient(135deg,#282828,#000);">');
+      vo.push('      <img src="https://img.youtube.com/vi/'+it.id+'/hqdefault.jpg" alt="'+vpEsc(it.title)+'" title="'+vpEsc(it.title)+'" loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.75;" />');
+      vo.push('      '+vpPlay);
+      vo.push('    </div>');
+      vo.push('    <h3 style="font-size:13px;line-height:1.35;margin:8px 0 2px;">'+vpEsc(it.title)+'</h3>');
+      if(it.desc!==it.title)vo.push('    <p style="font-size:12px;line-height:1.35;color:#666;margin:0;"><em>'+vpEsc(it.desc)+'</em></p>');
+      vo.push('  </div>');
+      var ldo={'@context':'https://schema.org','@type':'VideoObject','name':it.title,'description':it.desc,
+        'thumbnailUrl':['https://img.youtube.com/vi/'+it.id+'/hqdefault.jpg'],
+        'embedUrl':'https://www.youtube.com/embed/'+it.id,'inLanguage':'vi'};
+      vld.push(ldo);
+    });
+    vo.push('</div>');
+    vo.push('');
+    vo.push('<script type="application/ld+json">');
+    vo.push(JSON.stringify(vld.length===1?vld[0]:vld,null,2).replace(/</g,'\\u003c'));
+    vo.push('<\/script>');
+    code=vo.join('\n');
 
   }else if(currentBlock==='clock'){
     code='<div class="kenyo-clock kenyo-led">\n    <div class="time" id="kenyoTime">.</div>\n</div>';
@@ -4109,13 +4125,11 @@ function _doResetBlock(){
     document.getElementById('legal-owner-name').value='';
     document.getElementById('legal-owner-phone').value='';
     selectLegalMau(1);
-  }else if(currentBlock==='phaply'){
-    document.getElementById('pl-rows').innerHTML='';
-    activePlRows=0;
-    addPlRow();
-    document.getElementById('pl-owner-name').value='';
-    document.getElementById('pl-owner-phone').value='';
-    selectPlMau(1);
+  }else if(currentBlock==='videoplus'){
+    document.getElementById('vp-rows').innerHTML='';
+    activeVpRows=0;
+    addVpRow();
+    document.getElementById('vp-heading').value='';
   }else if(currentBlock==='cta'){
     document.getElementById('cta-phone-1').value='0888838022';
     document.getElementById('cta-phone-2').value='0976618802';
@@ -4322,6 +4336,24 @@ document.getElementById('legal-img-rows').addEventListener('paste', function(e) 
   }
 });
 
+// 2b. Cho Khối Video + (dán nhiều link, mỗi dòng 1 link)
+document.getElementById('vp-rows').addEventListener('paste', function(e) {
+  var target = e.target;
+  if (target && target.tagName === 'INPUT' && target.id.startsWith('vp-link-')) {
+    var pasteText = (e.clipboardData || window.clipboardData).getData('text');
+    var links = pasteText.split(/\r?\n/).map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+    if (links.length <= 1) return;
+    e.preventDefault();
+    target.value = links[0];
+    for (var i = 1; i < links.length; i++) {
+      if (activeVpRows < MAX_VP) {
+        addVpRow();
+        document.getElementById('vp-link-' + activeVpRows).value = links[i];
+      }
+    }
+  }
+});
+
 // 3. Cho Khối Video
 document.getElementById('video-slots').addEventListener('paste', function(e) {
   var target = e.target;
@@ -4428,7 +4460,7 @@ numberTabs();
 selectMau(1);
 addImgRow();
 addLegalImgRow();
-addPlRow();
+addVpRow();
 syncMobileNav('title');
 
 // ── PWA: Manifest + Service Worker ──
@@ -4447,13 +4479,13 @@ syncMobileNav('title');
     ctx.fillStyle='#10b981';ctx.font='bold '+Math.round(size*0.11)+'px -apple-system,sans-serif';
     ctx.fillText('\u0110\u1ee9c L\u1ee3i',size/2,size*0.68);
     ctx.fillStyle='#7b82a0';ctx.font=Math.round(size*0.09)+'px -apple-system,sans-serif';
-    ctx.fillText('V59',size/2,size*0.82);
+    ctx.fillText('V62',size/2,size*0.82);
     cb(c.toDataURL('image/png'));
   }
   makeIconDataURL(192,function(dataUrl192){
     makeIconDataURL(512,function(dataUrl512){
       var manifest={
-        name:'Kenyo \u0110\u1ee9c L\u1ee3i V59',
+        name:'Kenyo \u0110\u1ee9c L\u1ee3i V62',
         short_name:'Kenyo \u0110L',
         description:'T\u1ea1o code HTML trang chi ti\u1ebft B\u0110S \u2014 M\u1ed9t gi\u00e2y bi\u1ebft ngay kh\u00e1ch',
         start_url:'https://dangtin.678.vn/',
